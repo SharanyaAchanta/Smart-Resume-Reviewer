@@ -18,7 +18,7 @@ An AI-powered resume analyzer and improvement assistant.
 
 ## 🌐 Tech Stack
 
-- **Frontend**: HTML, CSS, JavaScript
+- **Frontend**: HTML/CSS(For styling purpose)
 - **Backend**: Python (Streamlit)
 - **AI Logic**: Rule-based or prompt-based suggestions
 - **PDF Parsing**: PyMuPDF / pdfminer.six
@@ -47,6 +47,7 @@ An AI-powered resume analyzer and improvement assistant.
 
    ```
 ---
+
 
 
 
