@@ -1,0 +1,83 @@
+{
+  "Software Engineer": [
+    "python",
+    "java",
+    "git",
+    "rest api",
+    "data structures",
+    "algorithms",
+    "problem solving",
+    "docker"
+  ],
+  "Data Analyst": [
+    "excel",
+    "sql",
+    "tableau",
+    "power bi",
+    "data cleaning",
+    "data visualization",
+    "statistics",
+    "python"
+  ],
+  "Machine Learning Engineer": [
+    "python",
+    "tensorflow",
+    "pytorch",
+    "machine learning",
+    "deep learning",
+    "data preprocessing",
+    "model training",
+    "numpy",
+    "pandas"
+  ],
+  "Frontend Developer": [
+    "html",
+    "css",
+    "javascript",
+    "react",
+    "responsive design",
+    "redux",
+    "version control",
+    "typescript"
+  ],
+  "Backend Developer": [
+    "node.js",
+    "express",
+    "mongodb",
+    "sql",
+    "rest api",
+    "authentication",
+    "docker",
+    "system design"
+  ],
+  "Full Stack Developer": [
+    "html",
+    "css",
+    "javascript",
+    "react",
+    "node.js",
+    "mongodb",
+    "version control",
+    "api integration"
+  ],
+  "Cybersecurity Analyst": [
+    "network security",
+    "firewalls",
+    "penetration testing",
+    "vulnerability assessment",
+    "linux",
+    "siem tools",
+    "risk management",
+    "incident response"
+  ],
+  "Cloud Engineer": [
+    "aws",
+    "azure",
+    "gcp",
+    "terraform",
+    "docker",
+    "kubernetes",
+    "cloud architecture",
+    "ci/cd pipelines"
+  ]
+}
