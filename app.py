@@ -25,7 +25,7 @@ if uploaded_file:
     st.subheader("Extracted Resume Text")
     st.write(cleaned_text)
 
-    suggestions = get_resume_feedback(cleaned_text)
-    show_suggestions(suggestions)
+    suggestions, resume_score, keyword_match = get_resume_feedback(cleaned_text, selected_role)
+    show_suggestions(suggestions, resume_score, keyword_match)
 else:
     st.info("Please upload a PDF resume to get started.")
