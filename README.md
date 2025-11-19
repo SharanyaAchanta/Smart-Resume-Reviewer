@@ -1,5 +1,7 @@
 # Smart-Resume-Reviewer
 An AI-powered resume analyzer and improvement assistant.
+#Check out the app now
+https://smart-resume-reviewer-oygjhtx9qnhf4iztnprmcg.streamlit.app/
 # Smart Resume Reviewer 🧠📄
 
 **Smart Resume Reviewer** is an open-source tool that helps job seekers improve their resumes with AI-powered suggestions. Upload your resume and get tips to enhance formatting, missing sections, relevant keywords, and more.
@@ -47,6 +49,7 @@ An AI-powered resume analyzer and improvement assistant.
 
    ```
 ---
+
 
 
 
