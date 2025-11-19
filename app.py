@@ -1,4 +1,5 @@
 import streamlit as st
+import json
 from utils.resume_parser import parse_resume, clean_text
 from utils.analyze_resume import get_resume_feedback
 from components.header import show_header
@@ -7,6 +8,13 @@ from components.suggestions import show_suggestions
 st.set_page_config(page_title="Smart Resume Analyzer", layout="wide")
 
 show_header()
+
+# Load job roles
+with open("utils/job_roles.json", "r") as f:
+    job_roles = json.load(f)
+
+st.subheader("Choose Job Role")
+selected_role = st.selectbox("Select the job you are applying for:", list(job_roles.keys()))
 
 uploaded_file = st.file_uploader("Upload Resume (PDF)", type="pdf")
 
