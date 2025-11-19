@@ -1,6 +1,6 @@
 # Smart-Resume-Reviewer
 An AI-powered resume analyzer and improvement assistant.
-#Check out the app now
+# Check out the app now
 https://smart-resume-reviewer-oygjhtx9qnhf4iztnprmcg.streamlit.app/
 # Smart Resume Reviewer 🧠📄
 
@@ -49,6 +49,7 @@ https://smart-resume-reviewer-oygjhtx9qnhf4iztnprmcg.streamlit.app/
 
    ```
 ---
+
 
 
 
