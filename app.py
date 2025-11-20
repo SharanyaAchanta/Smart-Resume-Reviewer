@@ -8,6 +8,64 @@ from components.suggestions import show_suggestions
 
 st.set_page_config(page_title="Smart Resume Analyzer", layout="wide")
 
+# --- PREMIUM File Uploader Styling (Dark Neon Glow) ---
+st.markdown("""
+<style>
+
+/* Outer container (removes Streamlit’s extra padding) */
+.block-container {
+    padding-top: 1rem;
+}
+
+/* Premium Upload Box */
+[data-testid="stFileUploader"] {
+    border: 2px solid rgba(80, 200, 120, 0.35) !important;
+    background: linear-gradient(145deg, #131416, #1a1c1f) !important;
+    padding: 30px !important;
+    border-radius: 14px !important;
+    transition: all 0.35s ease-in-out !important;
+    cursor: pointer !important;
+}
+
+/* Icon + text color */
+[data-testid="stFileUploader"] * {
+    color: #e8f1f2 !important;
+}
+
+/* Make the cloud icon brighter */
+[data-testid="stFileUploader"] svg {
+    fill: #2ecc71 !important;
+    width: 36px !important;
+    height: 36px !important;
+}
+
+/* Hover (Neon Glow) */
+[data-testid="stFileUploader"]:hover {
+    border-color: #2ecc71 !important;
+    box-shadow: 0px 0px 18px rgba(46, 204, 113, 0.25);
+    transform: translateY(-2px);
+}
+
+/* Dragging file over the box */
+[data-testid="stFileUploader"].drag-over {
+    border-color: #1abc9c !important;
+    box-shadow: 0px 0px 25px rgba(26, 188, 156, 0.35);
+    background: #1c1f21 !important;
+}
+
+/* Browse files button sleek look */
+[data-testid="stFileUploader"] button {
+    background-color: rgba(255,255,255,0.06) !important;
+    color: white !important;
+    border-radius: 8px !important;
+    padding: 6px 12px !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+
 show_header()
 
 # Load job roles
@@ -18,6 +76,29 @@ st.subheader("Choose Job Role")
 selected_role = st.selectbox("Select the job you are applying for:", list(job_roles.keys()))
 
 uploaded_file = st.file_uploader("Upload Resume (PDF)", type="pdf")
+
+# --- Drag-over JS to highlight uploader box ---
+st.markdown("""
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const uploader = window.parent.document.querySelector('[data-testid="stFileUploader"]');
+
+    if (uploader) {
+        document.addEventListener('dragover', () => {
+            uploader.classList.add('drag-over');
+        });
+
+        document.addEventListener('dragleave', () => {
+            uploader.classList.remove('drag-over');
+        });
+
+        document.addEventListener('drop', () => {
+            uploader.classList.remove('drag-over');
+        });
+    }
+});
+</script>
+""", unsafe_allow_html=True)
 
 if uploaded_file:
     # 🔥 Add Loading Spinner
