@@ -51,7 +51,6 @@ https://smart-resume-reviewer-oygjhtx9qnhf4iztnprmcg.streamlit.app/
 ---
 
 ## 🚀 Project Setup
-
 ### 1️⃣ Create Virtual Environment
     virtualenv venv
     ./venv/Scripts/activate

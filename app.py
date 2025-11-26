@@ -6,6 +6,7 @@ from utils.resume_parser import parse_resume
 from utils.analyze_resume import get_resume_feedback
 from components.header import show_header, show_navbar
 from components.suggestions import show_suggestions
+from components.footer import show_footer
 
 st.set_page_config(page_title="Smart Resume Analyzer", layout="wide")
 
@@ -140,3 +141,6 @@ if uploaded_file:
         show_suggestions(suggestions, resume_score, keyword_match)
 else:
     st.info("Please upload a PDF resume to get started.")
+
+    show_footer()
+
