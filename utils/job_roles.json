@@ -80,39 +80,173 @@
     "cloud architecture",
     "ci/cd pipelines"
   ],
-    "DevOps Engineer": [
+   "Mobile App Developer": [
+    "android",
+    "ios",
+    "flutter",
+    "react native",
+    "kotlin",
+    "swift",
+    "mobile ui",
+    "play store",
+    "app store",
+    "api integration"
+  ],
+  "Data Engineer": [
+    "sql",
+    "etl",
+    "data pipelines",
+    "apache spark",
+    "hadoop",
+    "data warehousing",
+    "airflow",
+    "bigquery",
+    "data modeling",
+    "python"
+  ],
+  "Site Reliability Engineer": [
+    "sre",
+    "reliability",
+    "monitoring",
+    "observability",
+    "prometheus",
+    "grafana",
+    "incident management",
+    "on-call",
+    "capacity planning",
+    "automation"
+  ],
+  "QA Engineer": [
+    "manual testing",
+    "test cases",
+    "test plans",
+    "bug tracking",
+    "regression testing",
+    "functional testing",
+    "test execution",
+    "jira"
+  ],
+  "Test Automation Engineer": [
+    "selenium",
+    "cypress",
+    "playwright",
+    "automation frameworks",
+    "unit testing",
+    "integration testing",
+    "api testing",
+    "ci/cd",
+    "test scripts"
+  ],
+  "Product Manager": [
+    "roadmap",
+    "product strategy",
+    "user stories",
+    "requirements gathering",
+    "stakeholder management",
+    "prioritization",
+    "agile",
+    "scrum",
+    "market research"
+  ],
+  "Business Analyst": [
+    "requirements analysis",
+    "stakeholder communication",
+    "use cases",
+    "process mapping",
+    "user stories",
+    "sql",
+    "reporting",
+    "documentation",
+    "gap analysis"
+  ],
+  "Database Administrator": [
+    "database administration",
+    "backup and recovery",
+    "performance tuning",
+    "sql",
+    "postgresql",
+    "mysql",
+    "indexes",
+    "replication",
+    "security"
+  ],
+  "MLOps Engineer": [
+    "mlops",
+    "model deployment",
+    "model monitoring",
     "ci/cd",
     "docker",
     "kubernetes",
-    "jenkins",
-    "github actions",
+    "feature store",
+    "ml pipelines",
+    "cloud ml services"
+  ],
+  "AI Engineer": [
+    "machine learning",
+    "deep learning",
+    "nlp",
+    "computer vision",
+    "model training",
+    "python",
+    "tensorflow",
+    "pytorch",
+    "llms",
+    "inference optimization"
+  ],
+  "Security Engineer": [
+    "application security",
+    "threat modeling",
+    "penetration testing",
+    "security audits",
+    "vulnerability scanning",
+    "owasp",
+    "security automation",
+    "incident response"
+  ],
+  "Systems Engineer": [
     "linux",
-    "bash",
-    "terraform",
+    "system administration",
+    "shell scripting",
+    "infrastructure",
+    "virtualization",
+    "networking",
     "monitoring",
-    "cloud deployment"
+    "troubleshooting"
   ],
-  "Network Engineer": [
-    "tcp/ip",
-    "routing",
-    "switching",
-    "lan",
-    "wan",
-    "network security",
-    "firewall",
-    "vpn",
-    "dns",
-    "subnetting"
+  "Blockchain Developer": [
+    "blockchain",
+    "smart contracts",
+    "solidity",
+    "ethereum",
+    "web3",
+    "defi",
+    "nfts",
+    "dapps",
+    "cryptography"
   ],
-  "UI/UX Designer": [
-    "figma",
-    "wireframes",
-    "prototyping",
-    "user research",
-    "ux design",
-    "ui design",
-    "design systems",
-    "usability testing",
-    "interaction design"
+  "Game Developer": [
+    "unity",
+    "unreal engine",
+    "game design",
+    "c#",
+    "c++",
+    "gameplay programming",
+    "2d games",
+    "3d games",
+    "physics engines"
+  ],
+  "AR/VR Developer": [
+    "augmented reality",
+    "virtual reality",
+    "unity",
+    "unreal engine",
+    "3d modeling",
+    "vr interaction",
+    "xr",
+    "oculus",
+    "hololens"
   ]
 }
+
+
+ 
