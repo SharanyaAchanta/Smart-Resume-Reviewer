@@ -51,7 +51,17 @@ https://smart-resume-reviewer-oygjhtx9qnhf4iztnprmcg.streamlit.app/
 ---
 
 ## 🚀 Project Setup
+### 1️⃣ Create Virtual Environment
+    virtualenv venv
+    ./venv/Scripts/activate
 
+### 2️⃣ Install Dependencies
+    pip install -r requirements.txt
+
+### 3️⃣ Run the Application
+    streamlit run app.py
+
+---
 
 
 
