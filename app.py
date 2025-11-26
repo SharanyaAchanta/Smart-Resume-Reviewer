@@ -4,10 +4,22 @@ import json
 import time
 from utils.resume_parser import parse_resume
 from utils.analyze_resume import get_resume_feedback
-from components.header import show_header
+from components.header import show_header, show_navbar
 from components.suggestions import show_suggestions
 
 st.set_page_config(page_title="Smart Resume Analyzer", layout="wide")
+
+show_navbar()
+
+# Hide Streamlit top header / toolbar so your navbar is the only top bar
+st.markdown("""
+<style>
+/* hide Streamlit header and top toolbar */
+header, .stAppHeader, .stAppToolbar {
+    display: none !important;
+}
+</style>
+""", unsafe_allow_html=True)
 
 # --- PREMIUM File Uploader Styling (Dark Neon Glow) ---
 st.markdown("""
