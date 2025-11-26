@@ -79,5 +79,40 @@
     "kubernetes",
     "cloud architecture",
     "ci/cd pipelines"
+  ],
+    "DevOps Engineer": [
+    "ci/cd",
+    "docker",
+    "kubernetes",
+    "jenkins",
+    "github actions",
+    "linux",
+    "bash",
+    "terraform",
+    "monitoring",
+    "cloud deployment"
+  ],
+  "Network Engineer": [
+    "tcp/ip",
+    "routing",
+    "switching",
+    "lan",
+    "wan",
+    "network security",
+    "firewall",
+    "vpn",
+    "dns",
+    "subnetting"
+  ],
+  "UI/UX Designer": [
+    "figma",
+    "wireframes",
+    "prototyping",
+    "user research",
+    "ux design",
+    "ui design",
+    "design systems",
+    "usability testing",
+    "interaction design"
   ]
 }
