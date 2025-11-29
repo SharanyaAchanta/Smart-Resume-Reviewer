@@ -6,7 +6,7 @@ def upload_card():
     Modern upload card that returns the uploaded file object (or None).
     Uses a non-empty label to avoid Streamlit accessibility warnings.
     """
-    st.markdown('<div class="streamlit-card">', unsafe_allow_html=True)
+    st.markdown('<div class="streamlit-card fade-in">', unsafe_allow_html=True)
     st.subheader("Upload Your Resume")
     st.write("Please upload a PDF or DOCX resume to get detailed feedback.")
 

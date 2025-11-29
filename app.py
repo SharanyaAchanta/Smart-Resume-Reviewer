@@ -138,4 +138,3 @@ else:
     st.info("Please upload a PDF resume to get started.")
 
 show_footer()
-
