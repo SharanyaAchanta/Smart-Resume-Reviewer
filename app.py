@@ -1,4 +1,4 @@
-﻿# app.py (clean, fixed indentation, robust imports)
+﻿# app.py (contributors button CENTERED below header)
 import streamlit as st
 import json
 import time
@@ -15,6 +15,7 @@ from utils.resume_parser import parse_resume
 from utils.analyze_resume import get_resume_feedback
 from components.header import show_header, show_navbar
 from components.suggestions import show_suggestions
+from components.contributors import show_contributors_page
 
 try:
     from components.footer import render_footer as show_footer
@@ -31,8 +32,19 @@ try:
 except Exception:
     _HAS_UPLOAD_CARD = False
 
-show_navbar()
+show_navbar("Analyzer")
 show_header()
+
+# Contributors button - CENTERED below header
+col1, col2, col3 = st.columns([1, 2, 1])
+with col2:
+    if st.button("👥 View Contributors", use_container_width=True, type="primary"):
+        st.session_state.show_contributors = True
+
+# Show contributors if button clicked
+if st.session_state.get("show_contributors", False):
+    show_contributors_page()
+    st.stop()
 
 st.markdown(
     """
