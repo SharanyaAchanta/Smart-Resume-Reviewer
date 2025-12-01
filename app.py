@@ -1,4 +1,3 @@
-﻿# app.py (contributors button CENTERED below header)
 import streamlit as st
 import json
 import time
@@ -98,15 +97,8 @@ except Exception:
 st.subheader("Choose Job Role")
 selected_role = st.selectbox("Select the job you are applying for:", list(job_roles.keys()))
 
-uploaded = None
-if _HAS_UPLOAD_CARD:
-    try:
-        uploaded = upload_card()
-    except Exception as e:
-        st.warning(f"Upload card error: {e}")
-        uploaded = st.file_uploader("Upload Resume (PDF)", type="pdf", key="legacy_fallback")
-else:
-    uploaded = st.file_uploader("Upload Resume (PDF)", type="pdf", key="legacy_fallback")
+# Streamlit file uploader
+uploaded_file = st.file_uploader("Upload Resume (PDF)", type="pdf", help="Upload a PDF resume to analyze")
 
 
 
@@ -126,26 +118,52 @@ document.addEventListener('DOMContentLoaded', function() {
     unsafe_allow_html=True,
 )
 
-if uploaded:
-    with st.spinner("⏳ Analyzing your resume... Please wait..."):
-        time.sleep(1)
-        parsed = parse_resume(uploaded)
-        plain_text = parsed.get("plain_text", "")
-        flat_text = parsed.get("flat_text", "")
-        structured = parsed.get("structured", {})
+# --- Prevent duplicate processing due to Streamlit re-runs ---
+# We use session_state to ensure we analyze once per uploaded file object
+if "last_file_id" not in st.session_state:
+    st.session_state.last_file_id = None
 
-        st.subheader("📄 Extracted Resume Text — Cleaned (plain_text)")
-        st.text_area("Extracted Resume Text", value=plain_text, height=350)
+def _file_id(file):
+    # file has attributes name and type; use size & lastModified if available
+    try:
+        return f"{file.name}-{file.size}-{getattr(file, 'lastModified', '')}"
+    except Exception:
+        return getattr(file, "name", str(file))
 
-        st.subheader("📝 Structured (flat) view")
-        st.text_area("Flat sections + bullets", value=flat_text, height=300)
+if uploaded_file:
+    current_file_id = _file_id(uploaded_file)
+    if st.session_state.last_file_id != current_file_id:
+        st.session_state.last_file_id = current_file_id
 
-       # st.subheader("🔎 Parsed JSON Structure")
-       # st.json(structured)
+        with st.spinner("⏳ Analyzing your resume... Please wait..."):
+            # small delay to show spinner
+            time.sleep(1)
 
-        suggestions, resume_score, keyword_match = get_resume_feedback(plain_text, selected_role)
-        show_suggestions(suggestions, resume_score, keyword_match)
+            # Parse and analyze
+            parsed = parse_resume(uploaded_file)  # returns dict per parser
+            plain_text = parsed.get("plain_text", "")
+            flat_text = parsed.get("flat_text", "")
+            structured = parsed.get("structured", {})
+
+            # show extracted plain text in textarea (exact, cleaned)
+            st.subheader("📄 Extracted Resume Text — Cleaned (plain_text)")
+            st.text_area("Extracted Resume Text", value=plain_text, height=350)
+
+            # show flattened sectioned text
+            st.subheader("📝 Structured (flat) view")
+            st.text_area("Flat sections + bullets", value=flat_text, height=300)
+
+            # show JSON structured output collapsed by default
+            st.subheader("🔎 Parsed JSON Structure")
+            st.json(structured)
+
+            # call your analyzer with plain_text (the cleaned text)
+            suggestions, resume_score, keyword_match = get_resume_feedback(plain_text, selected_role)
+            show_suggestions(suggestions, resume_score, keyword_match)
+    else:
+        # same file re-run — avoid reprocessing
+        st.info("Resume already analyzed — upload a different file to re-run analysis.")
+        show_footer()
 else:
     st.info("Please upload a PDF resume to get started.")
-
-show_footer()
+    show_footer()
