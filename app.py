@@ -45,6 +45,9 @@ with col2:
 if st.session_state.get("show_contributors", False):
     show_contributors_page()
     st.stop()
+if "show_contributors" not in st.session_state:
+    st.session_state.show_contributors = False
+
 
 st.markdown(
     """
@@ -102,6 +105,9 @@ if _HAS_UPLOAD_CARD:
     except Exception as e:
         st.warning(f"Upload card error: {e}")
         uploaded = st.file_uploader("Upload Resume (PDF)", type="pdf", key="legacy_fallback")
+else:
+    uploaded = st.file_uploader("Upload Resume (PDF)", type="pdf", key="legacy_fallback")
+
 
 
 st.markdown(
@@ -134,8 +140,8 @@ if uploaded:
         st.subheader("📝 Structured (flat) view")
         st.text_area("Flat sections + bullets", value=flat_text, height=300)
 
-        st.subheader("🔎 Parsed JSON Structure")
-        st.json(structured)
+       # st.subheader("🔎 Parsed JSON Structure")
+       # st.json(structured)
 
         suggestions, resume_score, keyword_match = get_resume_feedback(plain_text, selected_role)
         show_suggestions(suggestions, resume_score, keyword_match)
