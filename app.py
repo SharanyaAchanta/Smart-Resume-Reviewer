@@ -95,21 +95,14 @@ except Exception:
 st.subheader("Choose Job Role")
 selected_role = st.selectbox("Select the job you are applying for:", list(job_roles.keys()))
 
-uploaded_file_legacy = st.file_uploader("Upload Resume (PDF)", type="pdf")
 uploaded = None
-
 if _HAS_UPLOAD_CARD:
     try:
-        uploaded_from_card = upload_card()
-        if uploaded_from_card:
-            uploaded = uploaded_from_card
-    except TypeError:
-        pass
+        uploaded = upload_card()
     except Exception as e:
-        st.warning(f"Upload card component error: {e}")
+        st.warning(f"Upload card error: {e}")
+        uploaded = st.file_uploader("Upload Resume (PDF)", type="pdf", key="legacy_fallback")
 
-if not uploaded:
-    uploaded = uploaded_file_legacy or st.session_state.get("resume_uploader")
 
 st.markdown(
     """
