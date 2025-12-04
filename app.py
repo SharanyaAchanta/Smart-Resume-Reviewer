@@ -4,18 +4,22 @@ import time
 
 st.set_page_config(page_title="Smart Resume Analyzer", layout="wide")
 
+# --- LOAD LOCAL CSS ---
 try:
     from components.styles import local_css
     local_css()
 except Exception:
     pass
 
+# --- IMPORT COMPONENTS ---
 from utils.resume_parser import parse_resume
 from utils.analyze_resume import get_resume_feedback
 from components.header import show_header, show_navbar
 from components.suggestions import show_suggestions
 from components.contributors import show_contributors_page
+from components.features import show_features_page
 
+# Footer import with fallback
 try:
     from components.footer import render_footer as show_footer
 except Exception:
@@ -25,43 +29,56 @@ except Exception:
         def show_footer():
             return None
 
+# Upload card check
 try:
     from components.upload_card import upload_card
     _HAS_UPLOAD_CARD = True
 except Exception:
     _HAS_UPLOAD_CARD = False
 
-show_navbar("Analyzer")
-show_header()
-
-# Contributors button - CENTERED below header
-col1, col2, col3 = st.columns([1, 2, 1])
-with col2:
-    if st.button("👥 View Contributors", use_container_width=True, type="primary"):
-        st.session_state.show_contributors = True
-
-# Show contributors if button clicked
-if st.session_state.get("show_contributors", False):
-    show_contributors_page()
-    st.stop()
+# --- SESSION STATE INIT ---
 if "show_contributors" not in st.session_state:
     st.session_state.show_contributors = False
+if "show_features" not in st.session_state:
+    st.session_state.show_features = False
+if "current_page" not in st.session_state:
+    st.session_state.current_page = "Analyzer"
+if "last_file_id" not in st.session_state:
+    st.session_state.last_file_id = None
 
+# --- NAVBAR & HEADER ---
+show_navbar(active_page=st.session_state.current_page)
+show_header()
+st.markdown("<br>", unsafe_allow_html=True)  # spacing below navbar
 
+# --- PAGE BUTTONS BELOW NAVBAR ---
+button_col1, button_col2 = st.columns([1, 1])
+with button_col1:
+    if st.button("👥 View Contributors", use_container_width=True, type="primary"):
+        st.session_state.show_contributors = True
+        st.session_state.show_features = False
+        st.session_state.current_page = "Contributors"
+
+with button_col2:
+    if st.button("✨How It Works ?", use_container_width=True, type="primary"):
+        st.session_state.show_features = True
+        st.session_state.show_contributors = False
+        st.session_state.current_page = "Features"
+
+# --- SHOW CONTRIBUTORS / FEATURES ---
+if st.session_state.show_contributors:
+    show_contributors_page()
+    st.stop()
+
+if st.session_state.show_features:
+    show_features_page()
+    st.stop()
+
+# --- STYLE OVERRIDES ---
 st.markdown(
     """
 <style>
-header, .stAppHeader, .stAppToolbar {
-    display: none !important;
-}
-</style>
-""",
-    unsafe_allow_html=True,
-)
-
-st.markdown(
-    """
-<style>
+header, .stAppHeader, .stAppToolbar { display: none !important; }
 .block-container { padding-top: 1rem; }
 [data-testid="stFileUploader"] {
     border: 2px solid rgba(80, 200, 120, 0.35) !important;
@@ -87,6 +104,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# --- LOAD JOB ROLES ---
 try:
     with open("utils/job_roles.json", "r") as f:
         job_roles = json.load(f)
@@ -97,11 +115,10 @@ except Exception:
 st.subheader("Choose Job Role")
 selected_role = st.selectbox("Select the job you are applying for:", list(job_roles.keys()))
 
-# Streamlit file uploader
+# --- FILE UPLOADER ---
 uploaded_file = st.file_uploader("Upload Resume (PDF)", type="pdf", help="Upload a PDF resume to analyze")
 
-
-
+# --- DRAG-OVER JS ---
 st.markdown(
     """
 <script>
@@ -118,50 +135,39 @@ document.addEventListener('DOMContentLoaded', function() {
     unsafe_allow_html=True,
 )
 
-# --- Prevent duplicate processing due to Streamlit re-runs ---
-# We use session_state to ensure we analyze once per uploaded file object
-if "last_file_id" not in st.session_state:
-    st.session_state.last_file_id = None
-
+# --- HELPER: FILE ID ---
 def _file_id(file):
-    # file has attributes name and type; use size & lastModified if available
     try:
         return f"{file.name}-{file.size}-{getattr(file, 'lastModified', '')}"
     except Exception:
         return getattr(file, "name", str(file))
 
+# --- RESUME ANALYSIS ---
 if uploaded_file:
     current_file_id = _file_id(uploaded_file)
     if st.session_state.last_file_id != current_file_id:
         st.session_state.last_file_id = current_file_id
 
         with st.spinner("⏳ Analyzing your resume... Please wait..."):
-            # small delay to show spinner
-            time.sleep(1)
+            time.sleep(1)  # simulate processing
 
-            # Parse and analyze
-            parsed = parse_resume(uploaded_file)  # returns dict per parser
+            parsed = parse_resume(uploaded_file)
             plain_text = parsed.get("plain_text", "")
             flat_text = parsed.get("flat_text", "")
             structured = parsed.get("structured", {})
 
-            # show extracted plain text in textarea (exact, cleaned)
             st.subheader("📄 Extracted Resume Text — Cleaned (plain_text)")
             st.text_area("Extracted Resume Text", value=plain_text, height=350)
 
-            # show flattened sectioned text
             st.subheader("📝 Structured (flat) view")
             st.text_area("Flat sections + bullets", value=flat_text, height=300)
 
-            # show JSON structured output collapsed by default
             st.subheader("🔎 Parsed JSON Structure")
             st.json(structured)
 
-            # call your analyzer with plain_text (the cleaned text)
             suggestions, resume_score, keyword_match = get_resume_feedback(plain_text, selected_role)
             show_suggestions(suggestions, resume_score, keyword_match)
     else:
-        # same file re-run — avoid reprocessing
         st.info("Resume already analyzed — upload a different file to re-run analysis.")
         show_footer()
 else:
