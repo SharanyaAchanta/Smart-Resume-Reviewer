@@ -60,7 +60,7 @@ with button_col1:
         st.session_state.current_page = "Contributors"
 
 with button_col2:
-    if st.button("✨How It Works ?", use_container_width=True, type="primary"):
+    if st.button("✨ Features", use_container_width=True, type="primary"):
         st.session_state.show_features = True
         st.session_state.show_contributors = False
         st.session_state.current_page = "Features"
