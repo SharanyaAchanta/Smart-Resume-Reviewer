@@ -29,23 +29,45 @@ https://smart-resume-reviewer-oygjhtx9qnhf4iztnprmcg.streamlit.app/
 
 ## 📁 Project Structure
 ```C:.
-├── .gitignore
-├── app.py
-├── LICENSE
-├── README.md
-├── requirements.txt
+Smart-Resume-Reviewer/
+│
+├── .github/
+│   ├── ISSUE_TEMPLATE/
+│   └── pull_request_template.md
+│
+├── assets/
+│   └── logo_Pixel.png
+│
 ├── components/
+│   ├── contributors.py
+│   ├── features.py
+│   ├── footer.py
 │   ├── header.py
-│   └── suggestions.py
+│   ├── styles.py
+│   ├── suggestions.py
+│   └── upload_card.py
+│
 ├── data/
 │   ├── Resume1.pdf
 │   └── Resume2.pdf
+│
 ├── static/
-│   ├── styles.css
-│   └── assets/
-└── utils/
-    ├── analyze_resume.py
-    └── resume_parser.py
+│   ├── css/
+│   └── prevent_double_submit.js
+│
+├── utils/
+│   ├── analyze_resume.py
+│   ├── job_roles.json
+│   └── resume_parser.py
+│
+├── .gitignore
+├── app.py
+├── CONTRIBUTING.md
+├── LICENSE
+├── package-lock.json
+├── README.md
+├── requirements.txt
+└── SECURITY.md
 
    ```
 ---
