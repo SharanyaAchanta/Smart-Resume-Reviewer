@@ -12,9 +12,11 @@ except Exception:
 
 from utils.resume_parser import parse_resume
 from utils.analyze_resume import get_resume_feedback
-from components.header import show_header, show_navbar
+from components.header import show_header
+from components.navbar import show_navbar
 from components.suggestions import show_suggestions
-from components.contributors import show_contributors_page
+from pages.contributors import show_contributors_page
+from pages.how_it_works import render
 
 try:
     from components.footer import render_footer as show_footer
@@ -30,6 +32,19 @@ try:
     _HAS_UPLOAD_CARD = True
 except Exception:
     _HAS_UPLOAD_CARD = False
+
+page = st.query_params.get("page", "home")
+
+if page == "contributors":
+    show_navbar("Contributors")
+    show_header()
+    show_contributors_page()
+    st.stop()
+
+if page == "how_it_works":
+    show_navbar("How It Works")
+    render()
+    st.stop()
 
 show_navbar("Analyzer")
 show_header()
