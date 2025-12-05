@@ -22,6 +22,33 @@ from components.suggestions import show_suggestions
 from components.contributors import show_contributors_page
 from components.features import show_features_page
 
+st.set_page_config(page_title="Smart Resume Analyzer", layout="wide")
+
+# --- PERSISTENT PRIVACY BANNER ---
+st.markdown("""
+<style>
+.privacy-banner {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    width: 100%;
+    background: #1f77b4;
+    color: white;
+    text-align: center;
+    font-size: 14px;
+    padding: 8px 0;
+    z-index: 9999;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.main .block-container {
+    padding-top: 50px !important; /* adjust spacing so content is not hidden under banner */
+}
+</style>
+<div class="privacy-banner">
+    🔒 Privacy Notice: This tool processes your resume <strong>locally in memory</strong>. No files or personal information are stored.
+</div>
+""", unsafe_allow_html=True)
+
 
 # Footer import with fallback
 try:
