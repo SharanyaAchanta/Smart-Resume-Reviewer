@@ -4,20 +4,26 @@ import time
 
 st.set_page_config(page_title="Smart Resume Analyzer", layout="wide")
 
+# --- LOAD LOCAL CSS ---
 try:
     from components.styles import local_css
     local_css()
 except Exception:
     pass
 
+# --- IMPORT COMPONENTS ---
 from utils.resume_parser import parse_resume
 from utils.analyze_resume import get_resume_feedback
 from components.header import show_header
 from components.navbar import show_navbar
 from components.suggestions import show_suggestions
+add-how-it-works
 from pages.contributors import show_contributors_page
 from pages.how_it_works import render
+from components.features import show_features_page
+main
 
+# Footer import with fallback
 try:
     from components.footer import render_footer as show_footer
 except Exception:
@@ -27,12 +33,14 @@ except Exception:
         def show_footer():
             return None
 
+# Upload card check
 try:
     from components.upload_card import upload_card
     _HAS_UPLOAD_CARD = True
 except Exception:
     _HAS_UPLOAD_CARD = False
 
+add-how-it-works
 page = st.query_params.get("page", "home")
 
 if page == "contributors":
@@ -47,37 +55,62 @@ if page == "how_it_works":
     st.stop()
 
 show_navbar("Analyzer")
-show_header()
-
-# Contributors button - CENTERED below header
-col1, col2, col3 = st.columns([1, 2, 1])
-with col2:
-    if st.button("👥 View Contributors", use_container_width=True, type="primary"):
-        st.session_state.show_contributors = True
-
-# Show contributors if button clicked
-if st.session_state.get("show_contributors", False):
-    show_contributors_page()
-    st.stop()
+# --- SESSION STATE INIT ---
 if "show_contributors" not in st.session_state:
     st.session_state.show_contributors = False
+if "show_features" not in st.session_state:
+    st.session_state.show_features = False
+if "current_page" not in st.session_state:
+    st.session_state.current_page = "Analyzer"
+if "last_file_id" not in st.session_state:
+    st.session_state.last_file_id = None
 
+# --- NAVBAR & HEADER ---
+show_navbar(active_page=st.session_state.current_page)
+main
+show_header()
+st.markdown("<br>", unsafe_allow_html=True)  # spacing below navbar
 
-st.markdown(
-    """
+# --- PAGE BUTTONS CENTERED ---
+col1, col2 = st.columns([1, 1])
+with col1:
+    st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
+    if st.button("👥 View Contributors", use_container_width=True, type="primary"):
+        st.session_state.show_contributors = True
+        st.session_state.show_features = False
+        st.session_state.current_page = "Contributors"
+    st.markdown("</div>", unsafe_allow_html=True)
+with col2:
+    st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
+    if st.button("✨ Features", use_container_width=True, type="primary"):
+        st.session_state.show_features = True
+        st.session_state.show_contributors = False
+        st.session_state.current_page = "Features"
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# --- SHOW CONTRIBUTORS / FEATURES ---
+if st.session_state.show_contributors:
+    show_contributors_page()
+    st.stop()
+if st.session_state.show_features:
+    show_features_page()
+    st.stop()
+
+# --- STYLE OVERRIDES ---
+st.markdown("""
 <style>
-header, .stAppHeader, .stAppToolbar {
-    display: none !important;
+header, .stAppHeader, .stAppToolbar { display: none !important; }
+.block-container { padding-top: 1rem; text-align: center; }
+.card {
+    background: #ffffff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
 }
-</style>
-""",
-    unsafe_allow_html=True,
-)
-
-st.markdown(
-    """
-<style>
-.block-container { padding-top: 1rem; }
+textarea, pre, .stTextArea, .stTextArea textarea { 
+    text-align: left; font-family: monospace; font-size: 14px; 
+}
 [data-testid="stFileUploader"] {
     border: 2px solid rgba(80, 200, 120, 0.35) !important;
     background: linear-gradient(145deg, #131416, #1a1c1f) !important;
@@ -85,6 +118,7 @@ st.markdown(
     border-radius: 14px !important;
     transition: all 0.35s ease-in-out !important;
     cursor: pointer !important;
+    margin: auto;
 }
 [data-testid="stFileUploader"] * { color: #e8f1f2 !important; }
 [data-testid="stFileUploader"] svg { fill: #2ecc71 !important; width: 36px !important; height: 36px !important; }
@@ -98,10 +132,9 @@ st.markdown(
     border: 1px solid rgba(255,255,255,0.1) !important;
 }
 </style>
-""",
-    unsafe_allow_html=True,
-)
+""", unsafe_allow_html=True)
 
+# --- LOAD JOB ROLES ---
 try:
     with open("utils/job_roles.json", "r") as f:
         job_roles = json.load(f)
@@ -112,13 +145,19 @@ except Exception:
 st.subheader("Choose Job Role")
 selected_role = st.selectbox("Select the job you are applying for:", list(job_roles.keys()))
 
-# Streamlit file uploader
-uploaded_file = st.file_uploader("Upload Resume (PDF)", type="pdf", help="Upload a PDF resume to analyze")
+# --- PRIVACY NOTICE ---
+st.info(
+    "🔒 **Privacy Notice:** Your resume is processed **only in memory** and **never stored on the server**. "
+    "No personal data is saved or logged."
+)
 
+# --- FILE UPLOADER ---
+uploaded_file = st.file_uploader(
+    "Upload Resume (PDF)", type="pdf", help="Upload a PDF resume to analyze"
+)
 
-
-st.markdown(
-    """
+# --- DRAG-OVER JS ---
+st.markdown("""
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const uploader = window.parent.document.querySelector('[data-testid="stFileUploader"]');
@@ -129,54 +168,43 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-""",
-    unsafe_allow_html=True,
-)
+""", unsafe_allow_html=True)
 
-# --- Prevent duplicate processing due to Streamlit re-runs ---
-# We use session_state to ensure we analyze once per uploaded file object
-if "last_file_id" not in st.session_state:
-    st.session_state.last_file_id = None
-
+# --- HELPER: FILE ID ---
 def _file_id(file):
-    # file has attributes name and type; use size & lastModified if available
     try:
         return f"{file.name}-{file.size}-{getattr(file, 'lastModified', '')}"
     except Exception:
         return getattr(file, "name", str(file))
 
+# --- RESUME ANALYSIS ---
 if uploaded_file:
     current_file_id = _file_id(uploaded_file)
     if st.session_state.last_file_id != current_file_id:
         st.session_state.last_file_id = current_file_id
 
         with st.spinner("⏳ Analyzing your resume... Please wait..."):
-            # small delay to show spinner
             time.sleep(1)
 
-            # Parse and analyze
-            parsed = parse_resume(uploaded_file)  # returns dict per parser
+            parsed = parse_resume(uploaded_file)
             plain_text = parsed.get("plain_text", "")
             flat_text = parsed.get("flat_text", "")
             structured = parsed.get("structured", {})
 
-            # show extracted plain text in textarea (exact, cleaned)
-            st.subheader("📄 Extracted Resume Text — Cleaned (plain_text)")
+            # --- Display Extracted Text ---
+            st.markdown("<div class='card'><h4>📄 Extracted Resume Text — Cleaned</h4></div>", unsafe_allow_html=True)
             st.text_area("Extracted Resume Text", value=plain_text, height=350)
 
-            # show flattened sectioned text
-            st.subheader("📝 Structured (flat) view")
+            st.markdown("<div class='card'><h4>📝 Structured (flat) view</h4></div>", unsafe_allow_html=True)
             st.text_area("Flat sections + bullets", value=flat_text, height=300)
 
-            # show JSON structured output collapsed by default
-            st.subheader("🔎 Parsed JSON Structure")
+            st.markdown("<div class='card'><h4>🔎 Parsed JSON Structure</h4></div>", unsafe_allow_html=True)
             st.json(structured)
 
-            # call your analyzer with plain_text (the cleaned text)
             suggestions, resume_score, keyword_match = get_resume_feedback(plain_text, selected_role)
+            st.markdown("<div class='card'><h4>💡 Suggestions & Resume Score</h4></div>", unsafe_allow_html=True)
             show_suggestions(suggestions, resume_score, keyword_match)
     else:
-        # same file re-run — avoid reprocessing
         st.info("Resume already analyzed — upload a different file to re-run analysis.")
         show_footer()
 else:
