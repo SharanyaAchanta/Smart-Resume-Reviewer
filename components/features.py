@@ -116,4 +116,31 @@ def show_features_page():
             </div>
         """, unsafe_allow_html=True)
 
+        #button to go main page
+    st.markdown(
+        """
+        <div style='text-align:center; margin-bottom: 20px;'>
+          <a href="/?page=home">
+            <button style="
+              background-color:#4CAF50;
+              color:white;
+              padding:10px 18px;
+              border:none;
+              border-radius:8px;
+              cursor:pointer;
+              font-size:16px;">
+              ⬅ Go to Main Page
+            </button>
+          </a>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # Main container (Streamlit)
+    st.markdown(
+        "<div style='margin-top: 1rem;'></div>",
+        unsafe_allow_html=True,
+    )
+
     st.success("💡 Tip: Keep updating this page as new features are added to the project!")
