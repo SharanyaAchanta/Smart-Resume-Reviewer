@@ -2,13 +2,33 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
+# Page config MUST be at the top
+st.set_page_config(
+    page_title="Contributors - Smart Resume Reviewer",
+    page_icon="👥",
+    layout="wide"
+)
 
 def show_contributors_page():
-    """Full-screen contributors dashboard embedded in Streamlit."""
-
-    # Optional: ensure wide layout when opened directly via this page
-    st.set_page_config(page_title="Contributors - Smart Resume Reviewer",
-                       page_icon="👥", layout="wide")
+    st.markdown(
+        """
+        <div style='text-align:center; margin-bottom: 20px;'>
+          <a href="/?page=home">
+            <button style="
+              background-color:#4CAF50;
+              color:white;
+              padding:10px 18px;
+              border:none;
+              border-radius:8px;
+              cursor:pointer;
+              font-size:16px;">
+              ⬅ Go to Main Page
+            </button>
+          </a>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
     # Main container (Streamlit)
     st.markdown(

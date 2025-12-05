@@ -14,10 +14,14 @@ except Exception:
 # --- IMPORT COMPONENTS ---
 from utils.resume_parser import parse_resume
 from utils.analyze_resume import get_resume_feedback
-from components.header import show_header, show_navbar
+from components.header import show_header
+from components.navbar import show_navbar
 from components.suggestions import show_suggestions
-from components.contributors import show_contributors_page
+add-how-it-works
+from pages.contributors import show_contributors_page
+from pages.how_it_works import render
 from components.features import show_features_page
+main
 
 # Footer import with fallback
 try:
@@ -36,6 +40,21 @@ try:
 except Exception:
     _HAS_UPLOAD_CARD = False
 
+add-how-it-works
+page = st.query_params.get("page", "home")
+
+if page == "contributors":
+    show_navbar("Contributors")
+    show_header()
+    show_contributors_page()
+    st.stop()
+
+if page == "how_it_works":
+    show_navbar("How It Works")
+    render()
+    st.stop()
+
+show_navbar("Analyzer")
 # --- SESSION STATE INIT ---
 if "show_contributors" not in st.session_state:
     st.session_state.show_contributors = False
@@ -48,6 +67,7 @@ if "last_file_id" not in st.session_state:
 
 # --- NAVBAR & HEADER ---
 show_navbar(active_page=st.session_state.current_page)
+main
 show_header()
 st.markdown("<br>", unsafe_allow_html=True)  # spacing below navbar
 
