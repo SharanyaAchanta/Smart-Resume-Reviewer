@@ -64,7 +64,7 @@ def show_navbar(active_page="Home"):
           <a href="/Home" class="{'active' if active_page=='Home' else ''}">🏠 Home</a>
           <a href="/Home" class="{'active' if active_page=='Analyzer' else ''}">📤 Resume Analyzer</a>
           <a href="/Contributors" class="{'active' if active_page=='Contributors' else ''}">👥 Contributors</a>
-          <a href="https://github.com/SharanyaAchanta/Smart-Resume-Reviewer" target="_blank">GitHub</a>
+          <a href="/Login" class="{'active' if active_page=='Login' else ''}">🔐 Login</a>
         </div>
       </div>
     </div>
