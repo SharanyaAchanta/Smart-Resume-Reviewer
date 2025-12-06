@@ -29,7 +29,9 @@ st.markdown("""
 <style>
 .privacy-banner {
     position: fixed;
-    top: 0; left: 0; right: 0;
+    top: auto; 
+    bottom: 0;
+    left: 0; right: 0;
     width: 100%;
     background: #1f77b4;
     color: white;
@@ -215,14 +217,11 @@ st.markdown("""
 <style>
 /* ✅ FIXED: Header fully visible - no hiding! */
 header, .stAppHeader, .stAppToolbar { 
-    display: block !important; 
-    z-index: 1000 !important;
-    position: relative !important;
+    display: none !important;
 }
 
 /* Main container spacing - header stays visible */
-.block-container { 
-    padding-top: 2rem !important; 
+.block-container {  
     padding-bottom: 200px !important;
     text-align: center; 
     margin-top: 0 !important;
