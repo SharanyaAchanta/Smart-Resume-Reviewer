@@ -1,65 +1,69 @@
-# 🌈 **Code of Conduct**
+# 📜 **Code of Conduct**
 
-Welcome to our community! To keep this space respectful, safe, and enjoyable for everyone, we follow these guidelines:
+## **🌟 Our Commitment**
 
----
+We are dedicated to maintaining a **safe, inclusive, and welcoming environment** for everyone who contributes to this project—regardless of age, gender identity, sexual orientation, disability, ethnicity, religion, or experience level.
 
-## 💛 **1. Be Respectful**
-
-Treat all members with kindness, empathy, and professionalism.
-Harassment, discrimination, or abusive behavior will not be tolerated.
+We strive to promote a community where **respect, learning, and collaboration** thrive.
 
 ---
 
-## 🤝 **2. Be Supportive & Constructive**
+## **🤝 Our Standards**
 
-Help others grow.
-Give feedback respectfully, stay open-minded, and encourage healthy discussions.
+### **Positive Behaviors (Encouraged):**
 
----
+* Being respectful and considerate toward others
+* Offering constructive feedback
+* Demonstrating empathy and kindness
+* Helping others understand the project
+* Valuing diverse opinions and experiences
+* Gracefully accepting suggestions and improvements
 
-## 🌍 **3. Use Inclusive Language**
+### **Unacceptable Behaviors (Not Allowed):**
 
-Choose words that make everyone feel welcome.
-Avoid offensive, rude, or exclusionary language.
-
----
-
-## 🚫 **4. No Spam or Harmful Behavior**
-
-Do not share irrelevant promotions, malicious code, or misleading information.
-
----
-
-## 📘 **5. Follow Project Rules**
-
-Respect contribution guidelines, coding standards, and maintainers’ instructions.
+* Harassment, hate speech, or discriminatory remarks
+* Personal attacks or insulting comments
+* Publishing private information without permission
+* Threats, violence, or any form of abusive conduct
+* Any behavior that disrupts the community or project focus
 
 ---
 
-## 📢 **6. Report Concerns Responsibly**
+## **🚨 Reporting Issues**
 
-If you notice any misconduct, reach out to the maintainers.
-All reports are handled confidentially and with care.
+If you witness or experience unacceptable behavior, please report it to the project maintainers through:
 
----
+* **GitHub Issues**, or
+* **Direct email (if maintainers provide one)**
 
-# 🛡️ **Enforcement**
-
-Violations may result in:
-
-* ⚠️ Warning
-* ⏳ Temporary suspension
-* 🚫 Permanent ban from the project
-
-The maintainers reserve the right to take appropriate action to ensure community safety.
+All reports will be handled **confidentially and respectfully**.
 
 ---
 
-# ✨ **Thank You!**
+## **⚖️ Enforcement**
 
-Thank you for helping us maintain a positive, inclusive, and welcoming community.
-Together, we build something amazing! 💛🌱💻
+Project maintainers have the right and responsibility to:
+
+* Remove comments or code that violate this Code of Conduct
+* Close issues or PRs that do not follow expected behavior
+* Ban contributors who repeatedly or severely violate the Code
+
+Enforcement decisions will be made **fairly and consistently**.
 
 ---
 
+## **🌐 Scope**
+
+This Code of Conduct applies to:
+
+* All project spaces (issues, discussions, PRs)
+* Public interactions within the community
+* Any platform associated with the project
+
+---
+
+## **📩 Contact**
+
+For questions or concerns about this Code of Conduct, please reach out to the maintainers.
+
+---
