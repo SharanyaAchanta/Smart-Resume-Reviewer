@@ -17,7 +17,7 @@ def show_suggestions(suggestions, resume_score, keyword_match):
         if "Missing important sections" in s:
             st.markdown(
                 f"""
-                <div style='background-color:#ff4d4d;padding:12px;border-radius:8px;color:white;margin-bottom:10px;'>
+                <div class='fade-in' style='background-color:#ff4d4d;padding:12px;border-radius:8px;color:white;margin-bottom:10px;'>
                     {s}
                 </div>
                 """,
