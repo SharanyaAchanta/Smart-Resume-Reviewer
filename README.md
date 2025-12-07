@@ -44,6 +44,49 @@ An intelligent, AI-powered resume analyzer that helps job seekers craft better r
 
 ## 📁 Project Structure
 
+
+```C:.
+Smart-Resume-Reviewer/
+│
+├── .github/
+│   ├── ISSUE_TEMPLATE/
+│   └── pull_request_template.md
+│
+├── assets/
+│   └── logo_Pixel.png
+│
+├── components/
+│   ├── contributors.py
+│   ├── features.py
+│   ├── footer.py
+│   ├── header.py
+│   ├── styles.py
+│   ├── suggestions.py
+│   └── upload_card.py
+│
+├── data/
+│   ├── Resume1.pdf
+│   └── Resume2.pdf
+│
+├── static/
+│   ├── css/
+│   └── prevent_double_submit.js
+│
+├── utils/
+│   ├── analyze_resume.py
+│   ├── job_roles.json
+│   └── resume_parser.py
+│
+├── .gitignore
+├── app.py
+├── CONTRIBUTING.md
+├── LICENSE
+├── package-lock.json
+├── README.md
+├── requirements.txt
+└── SECURITY.md
+
+
 ```
 Smart-Resume-Reviewer/
 │
@@ -177,7 +220,24 @@ Main dependencies:
 
 ---
 
+
 ## 🐛 Known Issues
+
+## 🚀 Project Setup
+### 1️⃣ Create Virtual Environment
+    virtualenv venv
+    ./venv/Scripts/activate
+
+### 2️⃣ Install Dependencies
+    pip install -r requirements.txt
+
+### 3️⃣ Run the Application
+    streamlit run app.py
+
+---
+
+
+
 
 - Large PDF files (>10MB) may take longer to process
 - Scanned PDF resumes require OCR (not yet implemented)
