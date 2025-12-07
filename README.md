@@ -10,6 +10,19 @@ An intelligent, AI-powered resume analyzer that helps job seekers craft better r
 ## 🌟 [Try it Now](https://smart-resume-reviewer-oygjhtx9qnhf4iztnprmcg.streamlit.app/)
 
 ---
+## 📑 Table of Contents
+
+1. [Overview](#smart-resume-reviewer)
+2. [Live Demo](#check-out-the-app-now)
+3. [Features](#-features)
+4. [Tech Stack](#-tech-stack)
+5. [Project Structure](#-project-structure)
+6. [Project Setup](#-project-setup)
+7. [Contributing](#contributing)
+8. [License](#license)
+
+---
+
 
 ## ✨ Overview
 
