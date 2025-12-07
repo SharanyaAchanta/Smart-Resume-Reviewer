@@ -1,0 +1,209 @@
+:root {
+  --bg: #f6f8fb;
+  --card: #ffffff;
+  --muted: #64748b;
+  --accent: linear-gradient(90deg, #6366f1, #06b6d4);
+  --radius: 14px;
+  --ff-sans: Inter, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--ff-sans) !important;
+  background: var(--bg) !important;
+}
+
+.streamlit-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: 0 12px 30px rgba(2, 6, 23, 0.06);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  margin-bottom: 18px;
+}
+
+.streamlit-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 22px 50px rgba(2, 6, 23, 0.1);
+}
+
+a.stButton > button,
+button.stButton {
+  border-radius: 10px !important;
+  padding: 10px 16px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.12) !important;
+  background: linear-gradient(90deg, #6366f1, #06b6d4) !important;
+  color: white !important;
+  border: none !important;
+}
+
+.css-1n76uvr,
+.stTextInput > div > input {
+  border-radius: 10px !important;
+  padding: 10px !important;
+  border: 1px solid #e6e9ef !important;
+}
+
+/* ----- FIX: Footer content getting cut ----- */
+footer,
+.footer,
+.stFooter {
+  overflow: visible !important;
+  height: auto !important;
+  padding-bottom: 40px !important;
+}
+
+/* Ensure the icons wrap correctly */
+.footer-icons,
+.follow-us {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 12px !important;
+}
+
+/* Make entire footer auto-height */
+div[data-testid="stVerticalBlock"] {
+  height: auto !important;
+}
+
+/* ===== AGGRESSIVE FOOTER FIX — append to end of static/css/globals.css ===== */
+
+/* ====== FOOTER VISIBILITY OVERRIDE (stronger) ====== */
+.site-footer,
+.site-footer * {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  text-shadow: none !important;
+}
+
+/* full-width footer with strong contrast */
+.site-footer {
+  background: linear-gradient(180deg, #0b0f14 0%, #0b0f14 100%) !important;
+  color: #ffffff !important;
+  padding: 56px 20px !important;
+  border-radius: 0 !important;
+  margin-top: 48px !important;
+  box-shadow: 0 18px 40px rgba(2, 6, 23, 0.22) !important;
+  width: 100% !important;
+  left: 0;
+  right: 0;
+}
+
+/* inner grid layout */
+.site-footer .footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 28px;
+  align-items: start;
+}
+
+/* readable headings & links */
+.site-footer h4 {
+  color: #ffffff !important;
+  margin-bottom: 8px !important;
+  font-size: 1.02rem !important;
+}
+.site-footer p,
+.site-footer li,
+.site-footer a {
+  color: #dfeaf6 !important;
+  opacity: 1 !important;
+}
+
+/* input look */
+.site-footer input {
+  background: #071018 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #e6eef6 !important;
+  padding: 10px !important;
+  border-radius: 10px !important;
+}
+
+/* social icons */
+.site-footer .footer-social a {
+  width: 48px !important;
+  height: 48px !important;
+  font-size: 18px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border-radius: 10px !important;
+  text-decoration: none !important;
+}
+
+/* make sure content area doesn't clip the footer */
+html,
+body,
+.stApp,
+.reportview-container,
+.main,
+.block-container {
+  overflow: visible !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin: 0 !important;
+}
+
+.st-emotion-cache-1a9lq08 {
+  flex: 0 0 700px !important;
+}
+
+@media (min-width: 768px) {
+  .st-emotion-cache-1a9lq08 {
+    flex: 0 0 450px !important;
+  }
+}
+
+@media (width = 912px) {
+  .st-emotion-cache-1a9lq08 {
+    flex: 0 0 500px !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .st-emotion-cache-1a9lq08 {
+    flex: 0 0 400px !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  .st-emotion-cache-1a9lq08 {
+    flex: 0 0 300px !important;
+  }
+}
+
+@keyframes fadeDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-down {
+  opacity: 0;
+  animation: fadeDown 1s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 1s ease-in-out forwards;
+}
