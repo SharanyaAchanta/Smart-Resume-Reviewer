@@ -1,22 +1,4 @@
-
-# app.py (replace the upload handling part)
-import streamlit as st
-
-# Theme toggle
-theme = st.sidebar.radio("Theme Mode:", ["Light", "Dark"])
-
-if theme == "Dark":
-    dark_css = """
-        <style>
-        body { background-color: #0e1117; color: white; }
-        .stApp { background-color: #0e1117; }
-        </style>
-    """
-    st.markdown(dark_css, unsafe_allow_html=True)
-
-
 ﻿import streamlit as st
-
 import json
 import time
 
