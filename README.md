@@ -57,6 +57,49 @@ An intelligent, AI-powered resume analyzer that helps job seekers craft better r
 
 ## 📁 Project Structure
 
+
+```C:.
+Smart-Resume-Reviewer/
+│
+├── .github/
+│   ├── ISSUE_TEMPLATE/
+│   └── pull_request_template.md
+│
+├── assets/
+│   └── logo_Pixel.png
+│
+├── components/
+│   ├── contributors.py
+│   ├── features.py
+│   ├── footer.py
+│   ├── header.py
+│   ├── styles.py
+│   ├── suggestions.py
+│   └── upload_card.py
+│
+├── data/
+│   ├── Resume1.pdf
+│   └── Resume2.pdf
+│
+├── static/
+│   ├── css/
+│   └── prevent_double_submit.js
+│
+├── utils/
+│   ├── analyze_resume.py
+│   ├── job_roles.json
+│   └── resume_parser.py
+│
+├── .gitignore
+├── app.py
+├── CONTRIBUTING.md
+├── LICENSE
+├── package-lock.json
+├── README.md
+├── requirements.txt
+└── SECURITY.md
+
+
 ```
 Smart-Resume-Reviewer/
 │
@@ -212,11 +255,28 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
+
 ## 📧 Contact
 
 **Project Maintainer**: [Your Name]
 - GitHub: [@yourusername](https://github.com/yourusername)
 - Email: your.email@example.com
+
+## 🚀 Project Setup
+### 1️⃣ Create Virtual Environment
+    virtualenv venv
+    ./venv/Scripts/activate
+
+### 2️⃣ Install Dependencies
+    pip install -r requirements.txt
+
+### 3️⃣ Run the Application
+    streamlit run app.py
+
+---
+
+
+
 
 **Project Link**: [https://github.com/yourusername/Smart-Resume-Reviewer](https://github.com/yourusername/Smart-Resume-Reviewer)
 
