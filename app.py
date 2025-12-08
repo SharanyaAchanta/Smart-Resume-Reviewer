@@ -1,29 +1,8 @@
-﻿
-# app.py (replace the upload handling part)
-import streamlit as st
-
-# Theme toggle
-theme = st.sidebar.radio("Theme Mode:", ["Light", "Dark"])
-
-if theme == "Dark":
-    dark_css = """
-        <style>
-        body { background-color: #0e1117; color: white; }
-        .stApp { background-color: #0e1117; }
-        </style>
-    """
-    st.markdown(dark_css, unsafe_allow_html=True)
-
-
-
-import streamlit as st
-
+﻿import streamlit as st
 import json
 import time
 
-
 st.set_page_config(page_title="Smart Resume Analyzer", layout="wide")
-
 
 # --- LOAD LOCAL CSS ---
 try:
@@ -31,7 +10,6 @@ try:
     local_css()
 except Exception:
     pass
-
 
 # --- IMPORT COMPONENTS ---
 from utils.resume_parser import parse_resume
@@ -41,7 +19,100 @@ from components.suggestions import show_suggestions
 from components.contributors import show_contributors_page
 from components.features import show_features_page
 
-st.set_page_config(page_title="Smart Resume Analyzer", layout="wide")
+# Initialize theme in session state
+if "theme" not in st.session_state:
+    st.session_state.theme = "Light"
+
+# Theme toggle with session state persistence
+theme = st.sidebar.radio(
+    "Theme Mode:",
+    ["Light", "Dark"],
+    index=0 if st.session_state.theme == "Light" else 1,
+)
+st.session_state.theme = theme
+
+# Apply CSS overrides based on theme
+if theme == "Dark":
+    st.markdown("""
+        <style>
+        body, .stApp {
+            background-color: #0e1117 !important;
+            color: #e8f1f2 !important;
+        }
+        .card {
+            background: #1b1f24 !important;
+            color: #e8f1f2 !important;
+        }
+        [data-testid="stFileUploader"] {
+            border: 2px solid rgba(80, 200, 120, 0.35) !important;
+            background: linear-gradient(145deg, #131416, #1a1c1f) !important;
+            padding: 30px !important;
+            border-radius: 14px !important;
+            transition: all 0.35s ease-in-out !important;
+            cursor: pointer !important;
+            margin: auto;
+        }
+        [data-testid="stFileUploader"] * {
+            color: #e8f1f2 !important;
+        }
+        [data-testid="stFileUploader"] svg {
+            fill: #2ecc71 !important;
+            width: 36px !important;
+            height: 36px !important;
+        }
+        [data-testid="stFileUploader"]:hover {
+            border-color: #2ecc71 !important;
+            box-shadow: 0px 0px 18px rgba(46, 204, 113, 0.25);
+            transform: translateY(-2px);
+        }
+        [data-testid="stFileUploader"].drag-over {
+            border-color: #1abc9c !important;
+            box-shadow: 0px 0px 25px rgba(26, 188, 156, 0.35);
+            background: #1c1f21 !important;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+else:
+    st.markdown("""
+        <style>
+        body, .stApp {
+            background-color: #fafbfc !important; /* softer off-white */
+            color: #1a202c !important; /* dark slate grey - excellent readability */
+        }
+        .card {
+            background: #f7fafc !important; /* very light slate blue */
+            color: #1a202c !important;
+            border: 1px solid #e2e8f0 !important;
+        }
+        [data-testid="stFileUploader"] {
+            border: 2px solid rgba(59, 130, 246, 0.3) !important;
+            background: linear-gradient(145deg, #f8fafc, #edf2f7) !important;
+            padding: 30px !important;
+            border-radius: 14px !important;
+            transition: all 0.35s ease-in-out !important;
+            cursor: pointer !important;
+            margin: auto;
+        }
+        [data-testid="stFileUploader"] * {
+            color: #2d3748 !important;
+        }
+        [data-testid="stFileUploader"] svg {
+            fill: #4299e1 !important;
+            width: 36px !important;
+            height: 36px !important;
+        }
+        [data-testid="stFileUploader"]:hover {
+            border-color: #3182ce !important;
+            box-shadow: 0px 0px 18px rgba(59, 130, 246, 0.25);
+            transform: translateY(-2px);
+        }
+        [data-testid="stFileUploader"].drag-over {
+            border-color: #2b6cb0 !important;
+            box-shadow: 0px 0px 25px rgba(59, 130, 246, 0.35);
+            background: #e6f3ff !important;
+        }
+        </style>
+    """, unsafe_allow_html=True)
 
 # --- PERSISTENT PRIVACY BANNER ---
 st.markdown("""
@@ -70,7 +141,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-
 # Footer import with fallback
 try:
     from components.footer import render_footer as show_footer
@@ -81,14 +151,12 @@ except Exception:
         def show_footer():
             return None
 
-
 # Upload card check
 try:
     from components.upload_card import upload_card
     _HAS_UPLOAD_CARD = True
 except Exception:
     _HAS_UPLOAD_CARD = False
-
 
 # ✅ CRITICAL: Initialize ALL session state FIRST (fixes refresh issues)
 if "show_contributors" not in st.session_state:
@@ -101,7 +169,6 @@ if "last_file_id" not in st.session_state:
     st.session_state.last_file_id = None
 if "consent" not in st.session_state:
     st.session_state.consent = None  # None = not chosen, "all" = accept all, "essential" = essential only
-
 
 # -----------------------------
 # UPDATED COOKIE BANNER - STANDARD WEBSITE STYLE
@@ -185,7 +252,7 @@ def cookie_banner():
     @media (max-width: 768px) {
         .cookie-popup { padding: 20px 16px; margin: 0 10px; }
         .cookie-text { font-size: 13px; }
-        .cookie-buttons { flex-direction: column-reverse; }
+        .cookie-buttons { flex-direction:  column-reverse; }
         .cookie-btn { width: 100%; margin-bottom: 8px; }
     }
     </style>
@@ -224,12 +291,10 @@ def cookie_banner():
         st.session_state.consent = "essential"
         st.rerun()
 
-
 # ✅ CONSENT CHECK - SHOWS ON HOME PAGE ONLY ONCE
 if st.session_state.consent is None:
     cookie_banner()
     st.stop()
-
 
 # ✅ GLOBAL STYLING - HEADER FULLY VISIBLE (FIXED!)
 st.markdown("""
@@ -261,9 +326,8 @@ header, .stAppHeader, .stAppToolbar {
     padding: 12px 28px !important;
 }
 
-/* Card styling */
+/* Card styling - theme override will handle colors */
 .card {
-    background: #ffffff;
     padding: 20px;
     margin-bottom: 20px;
     border-radius: 16px;
@@ -277,47 +341,21 @@ textarea, pre, .stTextArea, .stTextArea textarea {
     font-size: 14px; 
 }
 
-/* File uploader styling */
-[data-testid="stFileUploader"] {
-    border: 2px solid rgba(80, 200, 120, 0.35) !important;
-    background: linear-gradient(145deg, #131416, #1a1c1f) !important;
-    padding: 30px !important;
-    border-radius: 14px !important;
-    transition: all 0.35s ease-in-out !important;
-    cursor: pointer !important;
-    margin: auto;
-}
-[data-testid="stFileUploader"] * { color: #e8f1f2 !important; }
-[data-testid="stFileUploader"] svg { fill: #2ecc71 !important; width: 36px !important; height: 36px !important; }
-[data-testid="stFileUploader"]:hover { 
-    border-color: #2ecc71 !important; 
-    box-shadow: 0px 0px 18px rgba(46, 204, 113, 0.25); 
-    transform: translateY(-2px); 
-}
-[data-testid="stFileUploader"].drag-over { 
-    border-color: #1abc9c !important; 
-    box-shadow: 0px 0px 25px rgba(26, 188, 156, 0.35); 
-    background: #1c1f21 !important; 
-}
-
 /* Consent info styling */
 .stInfo { background-color: rgba(0,200,83,0.1) !important; border-left: 4px solid #00c853 !important; }
 </style>
 """, unsafe_allow_html=True)
-
 
 # --- NAVBAR & HEADER (FULLY VISIBLE NOW) ---
 show_navbar(active_page=st.session_state.current_page)
 show_header()
 st.markdown("<br><br>", unsafe_allow_html=True)  # Extra spacing for header visibility
 
-
 # --- CONSENT STATUS DISPLAY ---
 if st.session_state.consent == "essential":
     st.info("✅ **Essential cookies enabled.** Some optional features may be limited.")
 elif st.session_state.consent == "all":
     st.info("✅ **All cookies enabled.** Full functionality available.")
-
 
 # --- PAGE BUTTONS CENTERED ---
 # --- PAGE BUTTONS CENTERED BELOW NAVBAR ---
@@ -368,8 +406,6 @@ with col3:
         st.rerun()
     st.markdown("</div>", unsafe_allow_html=True)
 
-
-
 # --- SHOW CONTRIBUTORS / FEATURES ---
 if st.session_state.show_contributors:
     show_contributors_page()
@@ -382,7 +418,6 @@ if st.session_state.show_features:
         show_footer()
     st.stop()
 
-
 # --- LOAD JOB ROLES ---
 try:
     with open("utils/job_roles.json", "r") as f:
@@ -391,10 +426,8 @@ except Exception:
     job_roles = {"Default Role": "Default"}
     st.warning("Could not load utils/job_roles.json — using default role list.")
 
-
 st.subheader("Choose Job Role")
 selected_role = st.selectbox("Select the job you are applying for:", list(job_roles.keys()))
-
 
 # --- PRIVACY NOTICE ---
 st.info(
@@ -402,12 +435,10 @@ st.info(
     "No personal data is saved or logged."
 )
 
-
 # --- FILE UPLOADER ---
 uploaded_file = st.file_uploader(
     "Upload Resume (PDF)", type="pdf", help="Upload a PDF resume to analyze"
 )
-
 
 # --- DRAG-OVER JS ---
 st.markdown("""
@@ -423,14 +454,12 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 """, unsafe_allow_html=True)
 
-
 # --- HELPER: FILE ID ---
 def _file_id(file):
     try:
         return f"{file.name}-{file.size}-{getattr(file, 'lastModified', '')}"
     except Exception:
         return getattr(file, "name", str(file))
-
 
 # --- RESUME ANALYSIS ---
 if uploaded_file:

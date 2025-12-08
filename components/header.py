@@ -25,7 +25,7 @@ def show_navbar(active_page="Home"):
         visibility: hidden !important;
     }}
 
-    /* fixed full-bleed navbar in the main document (not iframe) */
+    /* fixed full-bleed navbar - THEME AWARE */
     .navbar {{
         position: fixed !important;
         top: 0 !important;
@@ -33,9 +33,26 @@ def show_navbar(active_page="Home"):
         right: 0 !important;
         width: 100vw !important;
         z-index: 999999 !important;
-        background: linear-gradient(135deg,#667eea 0%,#764ba2 100%) !important;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.35) !important;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15) !important;
     }}
+    
+    /* DARK THEME NAVBAR */
+    .navbar[data-theme="dark"] {{
+        background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%) !important;
+    }}
+    .navbar[data-theme="dark"] .nav-links a {{ color: #e2e8f0 !important; }}
+    .navbar[data-theme="dark"] .nav-links a.active {{ background: rgba(255,255,255,0.15) !important; }}
+    .navbar[data-theme="dark"] .nav-title {{ color: #f7fafc !important; }}
+    
+    /* LIGHT THEME NAVBAR */
+    .navbar[data-theme="light"] {{
+        background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%) !important;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.08) !important;
+    }}
+    .navbar[data-theme="light"] .nav-links a {{ color: #f7fafc !important; }}
+    .navbar[data-theme="light"] .nav-links a.active {{ background: rgba(255,255,255,0.25) !important; }}
+    .navbar[data-theme="light"] .nav-title {{ color: #ffffff !important; }}
+    
     .navbar .nav-inner {{
         max-width: 1200px;
         margin: 0 auto;
@@ -45,8 +62,20 @@ def show_navbar(active_page="Home"):
         padding: 12px 20px;
         box-sizing: border-box;
     }}
-    .nav-links a {{ color:#fff; text-decoration:none; padding:8px 12px; border-radius:14px; }}
-    .nav-links a.active {{ background: rgba(255,255,255,0.12); }}
+    .nav-links a {{ 
+        color:#fff; 
+        text-decoration:none; 
+        padding:8px 16px; 
+        border-radius:14px; 
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }}
+    .nav-links a:hover {{ transform: translateY(-1px); }}
+    .nav-links a.active {{ 
+        background: rgba(255,255,255,0.2) !important;
+        font-weight: 600;
+    }}
+    .nav-title {{ font-weight:700; font-size:18px; }}
     /* push app content below fixed navbar */
     .block-container {{ padding-top: 72px !important; }}
     @media (max-width:768px) {{
@@ -54,11 +83,11 @@ def show_navbar(active_page="Home"):
     }}
     </style>
 
-    <div class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="navbar" data-theme="{ 'dark' if st.session_state.get('theme') == 'Dark' else 'light' }" role="navigation" aria-label="Main navigation">
       <div class="nav-inner">
         <div style="display:flex; align-items:center; gap:12px;">
           {img_tag}
-          <div style="color:#fff; font-weight:700; font-size:18px;">Smart Resume Reviewer</div>
+          <div class="nav-title">Smart Resume Reviewer</div>
         </div>
         <div class="nav-links" role="menu" aria-label="Primary">
           <a href="/Home" class="{'active' if active_page=='Home' else ''}">🏠 Home</a>
@@ -72,7 +101,6 @@ def show_navbar(active_page="Home"):
 
     # render to main document (not iframe)
     st.markdown(nav_html, unsafe_allow_html=True)
-
 
 def show_header():
     st.markdown("<h1 class='fade-down' style='text-align: center;'>Smart Resume Analyzer 🧠📄</h1>", unsafe_allow_html=True)
