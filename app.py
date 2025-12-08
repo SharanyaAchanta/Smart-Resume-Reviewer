@@ -1,6 +1,7 @@
-﻿
-# app.py (replace the upload handling part)
+
 import streamlit as st
+import json
+import time
 
 # Theme toggle
 theme = st.sidebar.radio("Theme Mode:", ["Light", "Dark"])
@@ -14,12 +15,6 @@ if theme == "Dark":
     """
     st.markdown(dark_css, unsafe_allow_html=True)
 
-
-
-import streamlit as st
-
-import json
-import time
 
 
 st.set_page_config(page_title="Smart Resume Analyzer", layout="wide")
