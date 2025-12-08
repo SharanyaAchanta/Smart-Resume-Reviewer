@@ -37,10 +37,25 @@ def show_contributors_page():
 :root {
   --primary: #ff6347;
   --primary-dark: #ff4500;
-  --dark: #2b2b2b;
-  --dark-light: #333;
-  --text: #ffffff;
-  --text-light: #cccccc;
+}
+
+/* Theme-aware color variables */
+body[data-theme="light"] {
+  --dark: #fafbfc;
+  --dark-light: #f0f4f8;
+  --text: #1a202c;
+  --text-light: #4a5568;
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(0, 0, 0, 0.1);
+}
+
+body[data-theme="dark"] {
+  --dark: #0e1117;
+  --dark-light: #1b1f24;
+  --text: #e8f1f2;
+  --text-light: #a0aec0;
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.15);
 }
 
 * {
@@ -55,6 +70,7 @@ body {
   color: var(--text);
   line-height: 1.6;
 }
+
 
 .container {
   max-width: 1200px;
@@ -156,9 +172,9 @@ body {
 #stats::-webkit-scrollbar-thumb { background: var(--primary-dark); border-radius: 3px; }
 
 .stat-box {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--glass-bg);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid var(--glass-border);
   border-radius: 14px;
   padding: 15px 5px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -211,9 +227,9 @@ body {
 #searchInput, .filter-select {
   padding: 10px 16px;
   border-radius: 10px;
-  border: 1px solid rgba(247, 57, 9, 0.5);
-  background: rgba(252, 58, 10, 0.05);
-  color: #fff !important;
+  border: 1px solid rgba(255, 99, 71, 0.3);
+  background: rgba(255, 99, 71, 0.08);
+  color: var(--text) !important;
   transition: all 0.3s;
 }
 
@@ -529,7 +545,8 @@ button:hover { background: #0056b3; }
 </style>
 </head>
 
-<body>
+<body data-theme="{ 'dark' if st.session_state.get('theme')=='Dark' else 'light' }">
+
   <main class="main-content">
     <section class="contributors-hero">
       <div class="container">
