@@ -1,4 +1,4 @@
-
+﻿
 # app.py (replace the upload handling part)
 import streamlit as st
 
@@ -16,7 +16,7 @@ if theme == "Dark":
 
 
 
-﻿import streamlit as st
+import streamlit as st
 
 import json
 import time
@@ -320,8 +320,37 @@ elif st.session_state.consent == "all":
 
 
 # --- PAGE BUTTONS CENTERED ---
-col1, col2 = st.columns([1, 1])
+# --- PAGE BUTTONS CENTERED BELOW NAVBAR ---
+col1, col2, col3 = st.columns([1, 1, 1])
+button_style = """
+    <style>
+    .stButton>button {
+        border-radius: 12px !important;
+        font-weight: 600 !important;
+        padding: 12px 28px !important;
+        font-size: 16px !important;
+        background: linear-gradient(135deg, #00c853 0%, #00b140 100%);
+        color: white;
+        transition: all 0.3s ease;
+    }
+    .stButton>button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,200,83,0.4);
+    }
+    </style>
+"""
+st.markdown(button_style, unsafe_allow_html=True)
+
 with col1:
+    st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
+    if st.button("🏠 Home", use_container_width=True, type="primary"):
+        st.session_state.show_contributors = False
+        st.session_state.show_features = False
+        st.session_state.current_page = "Analyzer"
+        st.rerun()
+    st.markdown("</div>", unsafe_allow_html=True)
+
+with col2:
     st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
     if st.button("👥 View Contributors", use_container_width=True, type="primary"):
         st.session_state.show_contributors = True
@@ -329,7 +358,8 @@ with col1:
         st.session_state.current_page = "Contributors"
         st.rerun()
     st.markdown("</div>", unsafe_allow_html=True)
-with col2:
+
+with col3:
     st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
     if st.button("✨ Features", use_container_width=True, type="primary"):
         st.session_state.show_features = True
@@ -337,6 +367,7 @@ with col2:
         st.session_state.current_page = "Features"
         st.rerun()
     st.markdown("</div>", unsafe_allow_html=True)
+
 
 
 # --- SHOW CONTRIBUTORS / FEATURES ---
