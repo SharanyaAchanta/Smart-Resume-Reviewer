@@ -433,6 +433,7 @@ if st.session_state.show_features:
     st.stop()
 
 # --- LOAD JOB ROLES ---
+# --- LOAD JOB ROLES ---
 try:
     with open("utils/job_roles.json", "r") as f:
         job_roles = json.load(f)
@@ -440,8 +441,25 @@ except Exception:
     job_roles = {"Default Role": "Default"}
     st.warning("Could not load utils/job_roles.json — using default role list.")
 
+# Job category and role selection
 st.subheader("Choose Job Role")
-selected_role = st.selectbox("Select the job you are applying for:", list(job_roles.keys()))
+categories = list(job_roles.keys()) if isinstance(job_roles, dict) else ["Default Role"]
+selected_category = st.selectbox("Select Job Category:", categories)
+
+if isinstance(job_roles, dict) and selected_category in job_roles:
+    roles = list(job_roles[selected_category].keys())
+    selected_role = st.selectbox("Select Specific Role:", roles, key="role_select")
+    # Show role info
+    role_info = job_roles[selected_category][selected_role]
+    with st.expander(f"ℹ️ {selected_role} - Required Skills & Info", expanded=True):
+        col1, col2 = st.columns(2)
+        with col1:
+            st.info(role_info.get("description", "No description available"))
+        with col2:
+            st.success(f"**Required Skills:** {', '.join(role_info.get('required_skills', []))}")
+else:
+    selected_role = selected_category  # Fallback for flat structure
+
 
 # --- PRIVACY NOTICE ---
 st.info(
