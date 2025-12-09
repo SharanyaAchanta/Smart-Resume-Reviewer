@@ -1,4 +1,5 @@
-﻿import streamlit as st
+﻿
+import streamlit as st
 import json
 import time
 
@@ -18,10 +19,21 @@ from components.header import show_header, show_navbar
 from components.suggestions import show_suggestions
 from components.contributors import show_contributors_page
 from components.features import show_features_page
+from components import resume_tips
 
-# Initialize theme in session state
+# ✅ CRITICAL: Initialize ALL session state FIRST (fixes refresh issues)
 if "theme" not in st.session_state:
     st.session_state.theme = "Light"
+if "show_contributors" not in st.session_state:
+    st.session_state.show_contributors = False
+if "show_features" not in st.session_state:
+    st.session_state.show_features = False
+if "current_page" not in st.session_state:
+    st.session_state.current_page = "Analyzer"
+if "last_file_id" not in st.session_state:
+    st.session_state.last_file_id = None
+if "consent" not in st.session_state:
+    st.session_state.consent = None  # None = not chosen, "all" = accept all, "essential" = essential only
 
 # Theme toggle with session state persistence
 theme = st.sidebar.radio(
@@ -31,9 +43,16 @@ theme = st.sidebar.radio(
 )
 st.session_state.theme = theme
 
+# ✅ ROUTE TO RESUME TIPS PAGE
+if st.session_state.current_page == "Resume Tips":
+    resume_tips.main()  # components/resume_tips.py must define main()
+    # optional footer is handled inside resume_tips if needed or just return here
+    st.stop()
+
 # Apply CSS overrides based on theme
 if theme == "Dark":
-    st.markdown("""
+    st.markdown(
+        """
         <style>
         body, .stApp {
             background-color: #0e1117 !important;
@@ -71,16 +90,19 @@ if theme == "Dark":
             background: #1c1f21 !important;
         }
         </style>
-    """, unsafe_allow_html=True)
+        """,
+        unsafe_allow_html=True,
+    )
 else:
-    st.markdown("""
+    st.markdown(
+        """
         <style>
         body, .stApp {
-            background-color: #fafbfc !important; /* softer off-white */
-            color: #1a202c !important; /* dark slate grey - excellent readability */
+            background-color: #fafbfc !important;
+            color: #1a202c !important;
         }
         .card {
-            background: #f7fafc !important; /* very light slate blue */
+            background: #f7fafc !important;
             color: #1a202c !important;
             border: 1px solid #e2e8f0 !important;
         }
@@ -112,10 +134,13 @@ else:
             background: #e6f3ff !important;
         }
         </style>
-    """, unsafe_allow_html=True)
+        """,
+        unsafe_allow_html=True,
+    )
 
 # --- PERSISTENT PRIVACY BANNER ---
-st.markdown("""
+st.markdown(
+    """
 <style>
 .privacy-banner {
     position: fixed;
@@ -133,13 +158,15 @@ st.markdown("""
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 .main .block-container {
-    padding-top: 50px !important; /* adjust spacing so content is not hidden under banner */
+    padding-top: 50px !important;
 }
 </style>
 <div class="privacy-banner">
     🔒 Privacy Notice: This tool processes your resume <strong>locally in memory</strong>. No files or personal information are stored.
 </div>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 # Footer import with fallback
 try:
@@ -158,23 +185,12 @@ try:
 except Exception:
     _HAS_UPLOAD_CARD = False
 
-# ✅ CRITICAL: Initialize ALL session state FIRST (fixes refresh issues)
-if "show_contributors" not in st.session_state:
-    st.session_state.show_contributors = False
-if "show_features" not in st.session_state:
-    st.session_state.show_features = False
-if "current_page" not in st.session_state:
-    st.session_state.current_page = "Analyzer"
-if "last_file_id" not in st.session_state:
-    st.session_state.last_file_id = None
-if "consent" not in st.session_state:
-    st.session_state.consent = None  # None = not chosen, "all" = accept all, "essential" = essential only
-
 # -----------------------------
 # UPDATED COOKIE BANNER - STANDARD WEBSITE STYLE
 # -----------------------------
 def cookie_banner():
-    st.markdown("""
+    st.markdown(
+        """
     <style>
     .cookie-overlay {
         position: fixed;
@@ -256,9 +272,12 @@ def cookie_banner():
         .cookie-btn { width: 100%; margin-bottom: 8px; }
     }
     </style>
-    """, unsafe_allow_html=True)
+    """,
+        unsafe_allow_html=True,
+    )
 
-    st.markdown("""
+    st.markdown(
+        """
     <div class="cookie-overlay">
         <div class="cookie-popup">
             <div class="cookie-title">🍪 We use cookies</div>
@@ -269,20 +288,24 @@ def cookie_banner():
                 You can manage your preferences below. Learn more in our <a href="#" style="color: #00c853;">Privacy Policy</a>.
             </div>
             <div class="cookie-buttons">
-    """, unsafe_allow_html=True)
+    """,
+        unsafe_allow_html=True,
+    )
 
-    # Buttons positioned properly
     col1, col2 = st.columns([1, 1])
     with col1:
         accept_essential = st.button("Accept Essential", key="accept_essential", use_container_width=True)
     with col2:
         accept_all = st.button("Accept All", key="accept_all", use_container_width=True)
 
-    st.markdown("""
+    st.markdown(
+        """
             </div>
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    """,
+        unsafe_allow_html=True,
+    )
 
     if accept_all:
         st.session_state.consent = "all"
@@ -297,59 +320,49 @@ if st.session_state.consent is None:
     st.stop()
 
 # ✅ GLOBAL STYLING - HEADER FULLY VISIBLE (FIXED!)
-st.markdown("""
+st.markdown(
+    """
 <style>
-/* ✅ FIXED: Header fully visible - no hiding! */
 header, .stAppHeader, .stAppToolbar { 
     display: none !important;
 }
-
-/* Main container spacing - header stays visible */
 .block-container {  
     padding-bottom: 200px !important;
     text-align: center; 
     margin-top: 0 !important;
 }
-
-/* Mobile responsive */
 @media (max-width: 768px) { 
     .block-container { 
         padding-top: 1.5rem !important; 
         padding-bottom: 220px !important; 
     } 
 }
-
-/* Button styling */
 .stButton > button {
     border-radius: 12px !important;
     font-weight: 600 !important;
     padding: 12px 28px !important;
 }
-
-/* Card styling - theme override will handle colors */
 .card {
     padding: 20px;
     margin-bottom: 20px;
     border-radius: 16px;
     box-shadow: 0 6px 18px rgba(0,0,0,0.08);
 }
-
-/* Text areas */
 textarea, pre, .stTextArea, .stTextArea textarea { 
     text-align: left; 
     font-family: monospace; 
     font-size: 14px; 
 }
-
-/* Consent info styling */
 .stInfo { background-color: rgba(0,200,83,0.1) !important; border-left: 4px solid #00c853 !important; }
 </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
-# --- NAVBAR & HEADER (FULLY VISIBLE NOW) ---
+# --- NAVBAR & HEADER ---
 show_navbar(active_page=st.session_state.current_page)
 show_header()
-st.markdown("<br><br>", unsafe_allow_html=True)  # Extra spacing for header visibility
+st.markdown("<br><br>", unsafe_allow_html=True)
 
 # --- CONSENT STATUS DISPLAY ---
 if st.session_state.consent == "essential":
@@ -357,9 +370,8 @@ if st.session_state.consent == "essential":
 elif st.session_state.consent == "all":
     st.info("✅ **All cookies enabled.** Full functionality available.")
 
-# --- PAGE BUTTONS CENTERED ---
 # --- PAGE BUTTONS CENTERED BELOW NAVBAR ---
-col1, col2, col3 = st.columns([1, 1, 1])
+col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
 button_style = """
     <style>
     .stButton>button {
@@ -406,19 +418,28 @@ with col3:
         st.rerun()
     st.markdown("</div>", unsafe_allow_html=True)
 
+with col4:
+    st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
+    if st.button("📝 Resume Tips", use_container_width=True, type="primary"):
+        st.session_state.current_page = "Resume Tips"
+        st.session_state.show_features = False
+        st.session_state.show_contributors = False
+        st.rerun()
+    st.markdown("</div>", unsafe_allow_html=True)
+
 # --- SHOW CONTRIBUTORS / FEATURES ---
 if st.session_state.show_contributors:
     show_contributors_page()
     if callable(show_footer):
         show_footer()
     st.stop()
+
 if st.session_state.show_features:
     show_features_page()
     if callable(show_footer):
         show_footer()
     st.stop()
 
-# --- LOAD JOB ROLES ---
 # --- LOAD JOB ROLES ---
 try:
     with open("utils/job_roles.json", "r") as f:
@@ -427,7 +448,6 @@ except Exception:
     job_roles = {"Default Role": "Default"}
     st.warning("Could not load utils/job_roles.json — using default role list.")
 
-# Job category and role selection
 st.subheader("Choose Job Role")
 categories = list(job_roles.keys()) if isinstance(job_roles, dict) else ["Default Role"]
 selected_category = st.selectbox("Select Job Category:", categories)
@@ -435,17 +455,15 @@ selected_category = st.selectbox("Select Job Category:", categories)
 if isinstance(job_roles, dict) and selected_category in job_roles:
     roles = list(job_roles[selected_category].keys())
     selected_role = st.selectbox("Select Specific Role:", roles, key="role_select")
-    # Show role info
     role_info = job_roles[selected_category][selected_role]
     with st.expander(f"ℹ️ {selected_role} - Required Skills & Info", expanded=True):
-        col1, col2 = st.columns(2)
-        with col1:
+        c1, c2 = st.columns(2)
+        with c1:
             st.info(role_info.get("description", "No description available"))
-        with col2:
+        with c2:
             st.success(f"**Required Skills:** {', '.join(role_info.get('required_skills', []))}")
 else:
-    selected_role = selected_category  # Fallback for flat structure
-
+    selected_role = selected_category
 
 # --- PRIVACY NOTICE ---
 st.info(
@@ -459,7 +477,8 @@ uploaded_file = st.file_uploader(
 )
 
 # --- DRAG-OVER JS ---
-st.markdown("""
+st.markdown(
+    """
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const uploader = window.parent.document.querySelector('[data-testid="stFileUploader"]');
@@ -470,7 +489,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 # --- HELPER: FILE ID ---
 def _file_id(file):
@@ -493,7 +514,6 @@ if uploaded_file:
         flat_text = parsed.get("flat_text", "")
         structured = parsed.get("structured", {})
 
-        # --- Display Extracted Text ---
         st.markdown("<div class='card'><h4>📄 Extracted Resume Text — Cleaned</h4></div>", unsafe_allow_html=True)
         st.text_area("Extracted Resume Text", value=plain_text, height=350)
 
