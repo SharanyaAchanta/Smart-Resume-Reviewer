@@ -10,98 +10,118 @@ def _get_logo_base64(path: Path) -> str:
     except Exception:
         return ""
 
-def show_navbar(active_page="Home"):
+def show_sidebar_navbar(active_page="Analyzer"):
     logo_b64 = _get_logo_base64(ASSETS_LOGO_PATH)
-    img_tag = f'<img src="data:image/png;base64,{logo_b64}" width="36" style="border-radius:6px; vertical-align:middle;" />' if logo_b64 else ''
-
-    nav_html = f"""
-    <style>
-    /* hide Streamlit's default header safely */
-    header[role="banner"], [data-testid="stHeader"], [data-testid="stToolbar"] {{
-        display: none !important;
-        height: 0 !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        visibility: hidden !important;
-    }}
-
-    /* fixed full-bleed navbar - THEME AWARE */
-    .navbar {{
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        width: 100vw !important;
-        z-index: 999999 !important;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.15) !important;
-    }}
+    img_tag = f'<img src="data:image/png;base64,{logo_b64}" width="40" style="border-radius:8px; vertical-align:middle;" />' if logo_b64 else ''
     
-    /* DARK THEME NAVBAR */
-    .navbar[data-theme="dark"] {{
-        background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%) !important;
-    }}
-    .navbar[data-theme="dark"] .nav-links a {{ color: #e2e8f0 !important; }}
-    .navbar[data-theme="dark"] .nav-links a.active {{ background: rgba(255,255,255,0.15) !important; }}
-    .navbar[data-theme="dark"] .nav-title {{ color: #f7fafc !important; }}
+    current_theme = st.session_state.get('theme', 'Dark')
     
-    /* LIGHT THEME NAVBAR */
-    .navbar[data-theme="light"] {{
-        background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%) !important;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.08) !important;
-    }}
-    .navbar[data-theme="light"] .nav-links a {{ color: #f7fafc !important; }}
-    .navbar[data-theme="light"] .nav-links a.active {{ background: rgba(255,255,255,0.25) !important; }}
-    .navbar[data-theme="light"] .nav-title {{ color: #ffffff !important; }}
-    
-    .navbar .nav-inner {{
-        max-width: 1200px;
-        margin: 0 auto;
-        display:flex;
-        align-items:center;
-        justify-content:space-between;
-        padding: 12px 20px;
-        box-sizing: border-box;
-    }}
-    .nav-links a {{ 
-        color:#fff; 
-        text-decoration:none; 
-        padding:8px 16px; 
-        border-radius:14px; 
-        font-weight: 500;
-        transition: all 0.2s ease;
-    }}
-    .nav-links a:hover {{ transform: translateY(-1px); }}
-    .nav-links a.active {{ 
-        background: rgba(255,255,255,0.2) !important;
-        font-weight: 600;
-    }}
-    .nav-title {{ font-weight:700; font-size:18px; }}
-    /* push app content below fixed navbar */
-    .block-container {{ padding-top: 72px !important; }}
-    @media (max-width:768px) {{
-      .block-container {{ padding-top: 110px !important; }}
-    }}
-    </style>
-
-    <div class="navbar" data-theme="{ 'dark' if st.session_state.get('theme') == 'Dark' else 'light' }" role="navigation" aria-label="Main navigation">
-      <div class="nav-inner">
-        <div style="display:flex; align-items:center; gap:12px;">
-          {img_tag}
-          <div class="nav-title">Smart Resume Reviewer</div>
+    with st.sidebar:
+        # === LOGIN SECTION (TOP) ===
+        if "show_login_modal" not in st.session_state:
+            st.session_state.show_login_modal = False
+        if "logged_in" not in st.session_state:
+            st.session_state.logged_in = False
+        
+        if not st.session_state.logged_in:
+            if st.button("🔐 Login", use_container_width=True):
+                st.session_state.show_login_modal = True
+                st.rerun()
+            st.markdown("---")
+        else:
+            st.success("✅ Logged In")
+            if st.button("🚪 Logout", use_container_width=True):
+                for key in list(st.session_state.keys()):
+                    del st.session_state[key]
+                st.rerun()
+            st.markdown("---")
+        
+        # === LOGO & BRAND ===
+        st.markdown(f"""
+        <style>
+        .sidebar-header {{
+            padding: 1.5rem 1rem 1rem !important;
+            background: linear-gradient(135deg, rgba(14,17,23,0.95) 0%, rgba(27,31,36,0.95) 100%) !important;
+            border-radius: 16px !important;
+            margin-bottom: 1.5rem !important;
+            text-align: center !important;
+            backdrop-filter: blur(20px) !important;
+        }}
+        .sidebar-title {{
+            font-size: 24px !important;
+            font-weight: 900 !important;
+            background: linear-gradient(135deg, #00d4aa, #00b140) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            margin: 0 0 0.5rem 0 !important;
+        }}
+        .sidebar-subtitle {{
+            color: rgba(255,255,255,0.8) !important;
+            font-size: 14px !important;
+            margin: 0 !important;
+            line-height: 1.4 !important;
+        }}
+        </style>
+        <div class="sidebar-header">
+            {img_tag}
+            <h1 class="sidebar-title">Smart Resume Analyzer</h1>
+            <p class="sidebar-subtitle">Upload your resume (PDF) and get instant feedback!</p>
         </div>
-        <div class="nav-links" role="menu" aria-label="Primary">
-          <a href="/Home" class="{'active' if active_page=='Home' else ''}">🏠 Home</a>
-          <a href="/Home" class="{'active' if active_page=='Analyzer' else ''}">📤 Resume Analyzer</a>
-          <a href="/Contributors" class="{'active' if active_page=='Contributors' else ''}">👥 Contributors</a>
-          <a href="/Login" class="{'active' if active_page=='Login' else ''}">🔐 Login</a>
-        </div>
-      </div>
-    </div>
-    """
-
-    # render to main document (not iframe)
-    st.markdown(nav_html, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
+        
+        # === NAVIGATION LINKS ===
+        if st.button("🏠 Home", key="nav_home", use_container_width=True):
+            st.session_state.current_page = "Analyzer"
+            st.session_state.show_contributors = False
+            st.session_state.show_features = False
+            st.rerun()
+            
+        if st.button("📄 Analyzer", key="nav_analyzer", use_container_width=True):
+            st.session_state.current_page = "Analyzer"
+            st.session_state.show_contributors = False
+            st.session_state.show_features = False
+            st.rerun()
+            
+        if st.button("✨ Features", key="nav_features", use_container_width=True):
+            st.session_state.show_features = True
+            st.session_state.show_contributors = False
+            st.session_state.current_page = "Features"
+            st.rerun()
+            
+        if st.button("📝 Tips", key="nav_tips", use_container_width=True):
+            st.session_state.current_page = "Resume Tips"
+            st.session_state.show_features = False
+            st.session_state.show_contributors = False
+            st.rerun()
+            
+        if st.button("👥 Contributors", key="nav_contributors", use_container_width=True):
+            st.session_state.show_contributors = True
+            st.session_state.show_features = False
+            st.session_state.current_page = "Contributors"
+            st.rerun()
+            
+        # === THEME TOGGLE ===
+        st.markdown("---")
+        if st.button(f"{'☀️ Light' if current_theme == 'Dark' else '🌙 Dark'} Mode", 
+                    key="theme_toggle_main", use_container_width=True):
+            st.session_state.theme = "Light" if st.session_state.theme == "Dark" else "Dark"
+            st.rerun()
 
 def show_header():
-    st.markdown("<h1 class='fade-down' style='text-align: center;'>Smart Resume Analyzer 🧠📄</h1>", unsafe_allow_html=True)
-    st.markdown("<h5 class='fade-down' style='text-align: center; color: gray;'>Upload your resume (PDF) and get instant feedback!</h5>", unsafe_allow_html=True)
+    """SIMPLE TITLE ONLY in main content area"""
+    st.markdown("""
+    <style>
+    .simple-title {
+        font-size: clamp(2.5rem, 6vw, 4rem) !important;
+        font-weight: 900 !important;
+        background: linear-gradient(135deg, #00d4aa 0%, #00b140 100%) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        text-align: center !important;
+        margin: 2rem 0 1rem 0 !important;
+        padding: 1rem !important;
+    }
+    </style>
+    <h1 class="simple-title">Smart Resume Analyzer 🧠📄</h1>
+    """, unsafe_allow_html=True)
+   

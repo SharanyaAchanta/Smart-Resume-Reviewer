@@ -1,12 +1,10 @@
 import streamlit as st
-from components.header import show_navbar, show_header 
+from components.header import show_sidebar_navbar, show_header
+
 
 
 def main():
-    # Show global navbar & header with correct active page
-    show_navbar(active_page="Resume Tips")
-    show_header()
-
+   
     # Custom CSS
     st.markdown("""
     <style>

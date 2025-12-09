@@ -3,10 +3,7 @@ from streamlit_lottie import st_lottie
 import json
 import os
 
-from components.header import show_navbar, show_header 
-
-show_navbar(active_page="Features")
-show_header()
+from components.header import show_sidebar_navbar, show_header
 
 def load_lottie(path: str):
     """Load a Lottie animation from a local JSON file."""

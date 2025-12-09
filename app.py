@@ -3,8 +3,11 @@ import streamlit as st
 import json
 import time
 
-# Theme toggle
-theme = st.sidebar.radio("Theme Mode:", ["Light", "Dark"])
+# Theme from session (controlled by custom sidebar in header.py)
+if "theme" not in st.session_state:
+    st.session_state.theme = "Dark"
+theme = st.session_state.theme
+
 
 if theme == "Dark":
     dark_css = """
@@ -120,11 +123,13 @@ except Exception:
 # --- IMPORT COMPONENTS ---
 from utils.resume_parser import parse_resume
 from utils.analyze_resume import get_resume_feedback
-from components.header import show_header, show_navbar
+from components.header import show_header, show_sidebar_navbar
 from components.suggestions import show_suggestions
 from components.contributors import show_contributors_page
 from components.features import show_features_page
 from components import resume_tips
+from components.login import show_login
+
 
 # ✅ CRITICAL: Initialize ALL session state FIRST - DARK MODE DEFAULT
 if "theme" not in st.session_state:
@@ -139,14 +144,10 @@ if "last_file_id" not in st.session_state:
     st.session_state.last_file_id = None
 if "consent" not in st.session_state:
     st.session_state.consent = None  # None = not chosen, "all" = accept all, "essential" = essential only
-
-# Theme toggle with session state persistence - Dark selected by default
-theme = st.sidebar.radio(
-    "Theme Mode:",
-    ["Light", "Dark"],
-    index=1 if st.session_state.theme == "Dark" else 0,  # 🛑 CHANGED: Dark (index 1) is default
-)
-st.session_state.theme = theme
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+if "show_login_modal" not in st.session_state:
+    st.session_state.show_login_modal = False
 
 # ✅ ROUTE TO RESUME TIPS PAGE
 if st.session_state.current_page == "Resume Tips":
@@ -154,7 +155,7 @@ if st.session_state.current_page == "Resume Tips":
     st.stop()
 
 # Apply CSS overrides based on theme - DARK MODE FIRST
-if theme == "Dark":
+if st.session_state.theme == "Dark":
     st.markdown(
         """
         <style>
@@ -464,9 +465,30 @@ textarea, pre, .stTextArea, .stTextArea textarea {
     unsafe_allow_html=True,
 )
 
-# --- NAVBAR & HEADER ---
-show_navbar(active_page=st.session_state.current_page)
+# --- SIDEBAR NAVBAR & HEADER ---
+# --- SIDEBAR NAVBAR & HEADER ---
+show_sidebar_navbar(active_page=st.session_state.current_page)
 show_header()
+
+# LOGIN MODAL TRIGGER (Single source of truth)
+if st.session_state.get("show_login_modal", False):
+    from components.login import show_login
+    show_login()
+    
+    # BUTTONS TOGETHER AT BOTTOM
+    col1, col2 = st.columns([1,1])
+    with col1:
+        if st.button("❌ Close", key="close_modal", use_container_width=True):
+            st.session_state.show_login_modal = False
+            st.rerun()
+    with col2:
+        if st.button("✅ Login Success", key="login_success", use_container_width=True):
+            st.session_state.logged_in = True
+            st.session_state.show_login_modal = False
+            st.rerun()
+    st.markdown("---")
+
+
 st.markdown("<br><br>", unsafe_allow_html=True)
 
 # --- CONSENT STATUS DISPLAY ---
@@ -475,62 +497,6 @@ if st.session_state.consent == "essential":
 elif st.session_state.consent == "all":
     st.info("✅ **All cookies enabled.** Full functionality available.")
 
-# --- PAGE BUTTONS CENTERED BELOW NAVBAR ---
-col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
-button_style = """
-    <style>
-    .stButton>button {
-        border-radius: 12px !important;
-        font-weight: 600 !important;
-        padding: 12px 28px !important;
-        font-size: 16px !important;
-        background: linear-gradient(135deg, #00c853 0%, #00b140 100%);
-        color: white;
-        transition: all 0.3s ease;
-    }
-    .stButton>button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0,200,83,0.4);
-    }
-    </style>
-"""
-st.markdown(button_style, unsafe_allow_html=True)
-
-with col1:
-    st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
-    if st.button("🏠 Home", use_container_width=True, type="primary"):
-        st.session_state.show_contributors = False
-        st.session_state.show_features = False
-        st.session_state.current_page = "Analyzer"
-        st.rerun()
-    st.markdown("</div>", unsafe_allow_html=True)
-
-with col2:
-    st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
-    if st.button("👥 View Contributors", use_container_width=True, type="primary"):
-        st.session_state.show_contributors = True
-        st.session_state.show_features = False
-        st.session_state.current_page = "Contributors"
-        st.rerun()
-    st.markdown("</div>", unsafe_allow_html=True)
-
-with col3:
-    st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
-    if st.button("✨ Features", use_container_width=True, type="primary"):
-        st.session_state.show_features = True
-        st.session_state.show_contributors = False
-        st.session_state.current_page = "Features"
-        st.rerun()
-    st.markdown("</div>", unsafe_allow_html=True)
-
-with col4:
-    st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
-    if st.button("📝 Resume Tips", use_container_width=True, type="primary"):
-        st.session_state.current_page = "Resume Tips"
-        st.session_state.show_features = False
-        st.session_state.show_contributors = False
-        st.rerun()
-    st.markdown("</div>", unsafe_allow_html=True)
 
 # --- SHOW CONTRIBUTORS / FEATURES ---
 if st.session_state.show_contributors:
@@ -544,6 +510,24 @@ if st.session_state.show_features:
     if callable(show_footer):
         show_footer()
     st.stop()
+    
+# ---- PERFECT BOTTOM LOGIN MODAL ----
+if st.session_state.get("show_login_modal", False):
+    from components.login import show_login
+    show_login()
+    
+    # BUTTONS TOGETHER AT BOTTOM
+    col1, col2 = st.columns([1,1])
+    with col1:
+        if st.button("❌ Close", key="close_modal", use_container_width=True):
+            st.session_state.show_login_modal = False
+            st.rerun()
+    with col2:
+        if st.button("✅ Login Success", key="login_success", use_container_width=True):
+            st.session_state.logged_in = True
+            st.session_state.show_login_modal = False
+            st.rerun()
+    st.markdown("---")
 
 # --- LOAD JOB ROLES ---
 try:
