@@ -17,6 +17,99 @@ if theme == "Dark":
 
 st.set_page_config(page_title="Smart Resume Analyzer", layout="wide")
 
+# --- LOADING SCREEN WITH ANIMATION ---
+if "page_loaded" not in st.session_state:
+    st.session_state.page_loaded = False
+
+# Show loading screen on first load
+if not st.session_state.page_loaded:
+    # Full page loading overlay (Dark theme preview)
+    st.markdown("""
+    <style>
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 99999;
+        font-family: 'Segoe UI', -apple-system, sans-serif;
+    }
+    .loading-spinner {
+        width: 60px;
+        height: 60px;
+        border: 6px solid rgba(255,255,255,0.1);
+        border-top: 6px solid #00d4aa;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 24px;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    .loading-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 8px;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+    .loading-subtitle {
+        font-size: 16px;
+        color: rgba(255,255,255,0.85);
+        margin-bottom: 16px;
+    }
+    .loading-dots {
+        display: flex;
+        gap: 4px;
+    }
+    .dot {
+        width: 10px;
+        height: 10px;
+        background: rgba(0,212,170,0.8);
+        border-radius: 50%;
+        animation: bounce 1.4s infinite ease-in-out;
+    }
+    .dot:nth-child(1) { animation-delay: -0.32s; }
+    .dot:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes bounce {
+        0%, 80%, 100% { transform: scale(0); }
+        40% { transform: scale(1); }
+    }
+    </style>
+    
+    <div class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-title">Smart Resume Analyzer</div>
+        <div class="loading-subtitle">Loading your AI-powered resume tool...</div>
+        <div class="loading-dots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Simulate loading time and mark as loaded
+    time.sleep(2.5)
+    st.session_state.page_loaded = True
+    st.rerun()
+    st.stop()
+
+# --- HIDE STREAMLIT DEFAULT LOADING ---
+st.markdown("""
+<style>
+/* Hide Streamlit loading spinner */
+[data-testid="stSpinnerOverlay"] { display: none !important; }
+</style>
+""", unsafe_allow_html=True)
+
 # --- LOAD LOCAL CSS ---
 try:
     from components.styles import local_css
@@ -33,9 +126,9 @@ from components.contributors import show_contributors_page
 from components.features import show_features_page
 from components import resume_tips
 
-# ✅ CRITICAL: Initialize ALL session state FIRST (fixes refresh issues)
+# ✅ CRITICAL: Initialize ALL session state FIRST - DARK MODE DEFAULT
 if "theme" not in st.session_state:
-    st.session_state.theme = "Light"
+    st.session_state.theme = "Dark"  # 🛑 CHANGED: Dark is now default
 if "show_contributors" not in st.session_state:
     st.session_state.show_contributors = False
 if "show_features" not in st.session_state:
@@ -47,21 +140,20 @@ if "last_file_id" not in st.session_state:
 if "consent" not in st.session_state:
     st.session_state.consent = None  # None = not chosen, "all" = accept all, "essential" = essential only
 
-# Theme toggle with session state persistence
+# Theme toggle with session state persistence - Dark selected by default
 theme = st.sidebar.radio(
     "Theme Mode:",
     ["Light", "Dark"],
-    index=0 if st.session_state.theme == "Light" else 1,
+    index=1 if st.session_state.theme == "Dark" else 0,  # 🛑 CHANGED: Dark (index 1) is default
 )
 st.session_state.theme = theme
 
 # ✅ ROUTE TO RESUME TIPS PAGE
 if st.session_state.current_page == "Resume Tips":
     resume_tips.main()  # components/resume_tips.py must define main()
-    # optional footer is handled inside resume_tips if needed or just return here
     st.stop()
 
-# Apply CSS overrides based on theme
+# Apply CSS overrides based on theme - DARK MODE FIRST
 if theme == "Dark":
     st.markdown(
         """
@@ -150,6 +242,7 @@ else:
         unsafe_allow_html=True,
     )
 
+# [Rest of your existing code continues unchanged from here...]
 # --- PERSISTENT PRIVACY BANNER ---
 st.markdown(
     """
@@ -280,7 +373,7 @@ def cookie_banner():
     @media (max-width: 768px) {
         .cookie-popup { padding: 20px 16px; margin: 0 10px; }
         .cookie-text { font-size: 13px; }
-        .cookie-buttons { flex-direction:  column-reverse; }
+        .cookie-buttons { flex-direction: column-reverse; }
         .cookie-btn { width: 100%; margin-bottom: 8px; }
     }
     </style>
