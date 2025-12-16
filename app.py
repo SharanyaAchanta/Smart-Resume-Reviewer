@@ -124,7 +124,7 @@ except Exception:
 from utils.resume_parser import parse_resume
 from utils.analyze_resume import get_resume_feedback
 from components.header import show_header, show_sidebar_navbar
-from components.suggestions import show_suggestions
+from components.suggestions import show_suggestions, get_grammar_suggestions
 from components.contributors import show_contributors_page
 from components.features import show_features_page
 from components import resume_tips
@@ -614,7 +614,7 @@ if uploaded_file:
 
         suggestions, resume_score, keyword_match = get_resume_feedback(plain_text, selected_role)
         st.markdown("<div class='card'><h4>💡 Suggestions & Resume Score</h4></div>", unsafe_allow_html=True)
-        show_suggestions(suggestions, resume_score, keyword_match)
+        show_suggestions(suggestions, resume_score, keyword_match, plain_text)
     else:
         st.info("Resume already analyzed — upload a different file to re-run analysis.")
         if callable(show_footer):
