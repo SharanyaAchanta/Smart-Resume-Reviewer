@@ -16,21 +16,29 @@ def show_sidebar_navbar(active_page="Analyzer"):
     
     current_theme = st.session_state.get('theme', 'Dark')
     
-    with st.sidebar:
+with st.sidebar:
         # === LOGIN SECTION (TOP) ===
-        if "show_login_modal" not in st.session_state:
-            st.session_state.show_login_modal = False
-        if "logged_in" not in st.session_state:
-            st.session_state.logged_in = False
-        
-        if not st.session_state.logged_in:
-            if st.button("🔐 Login", use_container_width=True):
-                st.session_state.show_login_modal = True
-                st.rerun()
-            st.markdown("---")
-        else:
-            st.success("✅ Logged In")
-            if st.button("🚪 Logout", use_container_width=True):
+    if "auth_mode" not in st.session_state:
+        st.session_state.auth_mode = False
+    if "logged_in" not in st.session_state:
+        st.session_state.logged_in = False
+
+    if not st.session_state.logged_in:
+        if st.button("🔐 Login", key="sidebar_login", use_container_width=True):
+            st.session_state.auth_mode = True      # <— turn on full-page auth
+            st.experimental_rerun()
+
+        st.markdown("---")
+    else:
+        st.success("✅ Logged In")
+        if st.button("🚪 Logout", use_container_width=True):
+            for key in list(st.session_state.keys()):
+                del st.session_state[key]
+            st.experimental_rerun()
+        st.markdown("---")
+                else:
+        st.success("✅ Logged In")
+        if st.button("🚪 Logout", use_container_width=True):
                 for key in list(st.session_state.keys()):
                     del st.session_state[key]
                 st.rerun()
