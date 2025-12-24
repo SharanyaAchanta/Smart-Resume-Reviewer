@@ -1,3 +1,4 @@
 streamlit
 pymupdf
 streamlit-lottie
+language-tool-python
