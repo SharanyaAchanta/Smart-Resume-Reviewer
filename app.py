@@ -1,4 +1,3 @@
-
 import streamlit as st
 import json
 import time
@@ -7,7 +6,6 @@ import time
 if "theme" not in st.session_state:
     st.session_state.theme = "Dark"
 theme = st.session_state.theme
-
 
 if theme == "Dark":
     dark_css = """
@@ -26,7 +24,6 @@ if "page_loaded" not in st.session_state:
 
 # Show loading screen on first load
 if not st.session_state.page_loaded:
-    # Full page loading overlay (Dark theme preview)
     st.markdown("""
     <style>
     .loading-overlay {
@@ -99,7 +96,6 @@ if not st.session_state.page_loaded:
     </div>
     """, unsafe_allow_html=True)
     
-    # Simulate loading time and mark as loaded
     time.sleep(2.5)
     st.session_state.page_loaded = True
     st.rerun()
@@ -108,7 +104,6 @@ if not st.session_state.page_loaded:
 # --- HIDE STREAMLIT DEFAULT LOADING ---
 st.markdown("""
 <style>
-/* Hide Streamlit loading spinner */
 [data-testid="stSpinnerOverlay"] { display: none !important; }
 </style>
 """, unsafe_allow_html=True)
@@ -130,10 +125,9 @@ from components.features import show_features_page
 from components import resume_tips
 from components.login import show_login
 
-
-# ✅ CRITICAL: Initialize ALL session state FIRST - DARK MODE DEFAULT
+# ✅ CRITICAL: Initialize ALL session state FIRST
 if "theme" not in st.session_state:
-    st.session_state.theme = "Dark"  # 🛑 CHANGED: Dark is now default
+    st.session_state.theme = "Dark"
 if "show_contributors" not in st.session_state:
     st.session_state.show_contributors = False
 if "show_features" not in st.session_state:
@@ -143,18 +137,28 @@ if "current_page" not in st.session_state:
 if "last_file_id" not in st.session_state:
     st.session_state.last_file_id = None
 if "consent" not in st.session_state:
-    st.session_state.consent = None  # None = not chosen, "all" = accept all, "essential" = essential only
+    st.session_state.consent = None
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "show_login_modal" not in st.session_state:
     st.session_state.show_login_modal = False
+if "auth_mode" not in st.session_state:
+    st.session_state.auth_mode = False
+
+from components.login import show_login_page  # use your new full-page function
+
+# If we are in auth mode and not logged in, only show login/signup page
+if st.session_state.get("auth_mode", False) and not st.session_state.get("logged_in", False):
+    show_login_page()
+    st.stop()
+
 
 # ✅ ROUTE TO RESUME TIPS PAGE
 if st.session_state.current_page == "Resume Tips":
-    resume_tips.main()  # components/resume_tips.py must define main()
+    resume_tips.main()
     st.stop()
 
-# Apply CSS overrides based on theme - DARK MODE FIRST
+# Apply CSS overrides based on theme
 if st.session_state.theme == "Dark":
     st.markdown(
         """
@@ -243,7 +247,6 @@ else:
         unsafe_allow_html=True,
     )
 
-# [Rest of your existing code continues unchanged from here...]
 # --- PERSISTENT PRIVACY BANNER ---
 st.markdown(
     """
@@ -292,7 +295,7 @@ except Exception:
     _HAS_UPLOAD_CARD = False
 
 # -----------------------------
-# UPDATED COOKIE BANNER - STANDARD WEBSITE STYLE
+# UPDATED COOKIE BANNER
 # -----------------------------
 def cookie_banner():
     st.markdown(
@@ -420,12 +423,12 @@ def cookie_banner():
         st.session_state.consent = "essential"
         st.rerun()
 
-# ✅ CONSENT CHECK - SHOWS ON HOME PAGE ONLY ONCE
+# ✅ CONSENT CHECK
 if st.session_state.consent is None:
     cookie_banner()
     st.stop()
 
-# ✅ GLOBAL STYLING - HEADER FULLY VISIBLE (FIXED!)
+# ✅ GLOBAL STYLING
 st.markdown(
     """
 <style>
@@ -466,28 +469,13 @@ textarea, pre, .stTextArea, .stTextArea textarea {
 )
 
 # --- SIDEBAR NAVBAR & HEADER ---
-# --- SIDEBAR NAVBAR & HEADER ---
 show_sidebar_navbar(active_page=st.session_state.current_page)
 show_header()
 
-# LOGIN MODAL TRIGGER (Single source of truth)
+# LOGIN MODAL TRIGGER (single source of truth)
 if st.session_state.get("show_login_modal", False):
-    from components.login import show_login
     show_login()
-    
-    # BUTTONS TOGETHER AT BOTTOM
-    col1, col2 = st.columns([1,1])
-    with col1:
-        if st.button("❌ Close", key="close_modal", use_container_width=True):
-            st.session_state.show_login_modal = False
-            st.rerun()
-    with col2:
-        if st.button("✅ Login Success", key="login_success", use_container_width=True):
-            st.session_state.logged_in = True
-            st.session_state.show_login_modal = False
-            st.rerun()
-    st.markdown("---")
-
+    st.markdown("")  # small spacer
 
 st.markdown("<br><br>", unsafe_allow_html=True)
 
@@ -496,7 +484,6 @@ if st.session_state.consent == "essential":
     st.info("✅ **Essential cookies enabled.** Some optional features may be limited.")
 elif st.session_state.consent == "all":
     st.info("✅ **All cookies enabled.** Full functionality available.")
-
 
 # --- SHOW CONTRIBUTORS / FEATURES ---
 if st.session_state.show_contributors:
@@ -510,24 +497,6 @@ if st.session_state.show_features:
     if callable(show_footer):
         show_footer()
     st.stop()
-    
-# ---- PERFECT BOTTOM LOGIN MODAL ----
-if st.session_state.get("show_login_modal", False):
-    from components.login import show_login
-    show_login()
-    
-    # BUTTONS TOGETHER AT BOTTOM
-    col1, col2 = st.columns([1,1])
-    with col1:
-        if st.button("❌ Close", key="close_modal", use_container_width=True):
-            st.session_state.show_login_modal = False
-            st.rerun()
-    with col2:
-        if st.button("✅ Login Success", key="login_success", use_container_width=True):
-            st.session_state.logged_in = True
-            st.session_state.show_login_modal = False
-            st.rerun()
-    st.markdown("---")
 
 # --- LOAD JOB ROLES ---
 try:
