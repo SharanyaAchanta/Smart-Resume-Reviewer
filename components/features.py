@@ -44,7 +44,7 @@ def show_features_page():
             .section-divider {
                 height: 4px;
                 width: 100px;
-                background: linear-gradient(90deg, #667eea, #764ba2);
+                background: linear-gradient(90deg, #EC4899, #DB2777);
                 margin: 30px auto;
                 border-radius: 4px;
             }

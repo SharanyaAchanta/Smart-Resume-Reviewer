@@ -9,12 +9,12 @@ def main():
     st.markdown("""
     <style>
     .resume-tip-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #EC4899 0%, #DB2777 100%);
         padding: 2rem;
         border-radius: 20px;
         color: white;
         margin-bottom: 2rem;
-        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 10px 30px rgba(236, 72, 153, 0.3);
     }
     .tip-level {
         font-size: 1.2rem;
@@ -39,7 +39,7 @@ def main():
     # Header
     st.markdown("""
     <div style='text-align: center; padding: 3rem 0;'>
-        <h1 style='color: #667eea; font-size: 3rem;'>📝 Resume Tips by Experience Level</h1>
+        <h1 style='color: #EC4899; font-size: 3rem;'>📝 Resume Tips by Experience Level</h1>
         <p style='color: #666; font-size: 1.2rem; max-width: 600px; margin: 0 auto;'>
             Tailored advice for every career stage - from Freshers to Senior Professionals
         </p>
