@@ -1,5 +1,8 @@
 import streamlit as st
 import re
+import time
+import components.login
+import utils.db as db
 
 
 def is_valid_email(email: str):
@@ -56,76 +59,66 @@ def get_password_strength(password: str):
 
 
 def show_login_page():
-    """Standalone, full-page auth UI (Login + Signup tabs)."""
+    """Professional standalone auth UI with modern design."""
 
-    # ---- BASIC PAGE LAYOUT CSS ----
+    # ---- PROFESSIONAL AUTH UI CSS ----
     st.markdown(
         """
         <style>
         .auth-wrapper {
-            min-height: 100vh;
+            min-height: 85vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 40px 16px;
-            background: radial-gradient(circle at top, #1e293b 0, #020617 45%, #000000 100%);
+            padding: 20px;
+            background: transparent; /* Handled by global body gradient */
         }
+        
         .auth-card {
             width: 100%;
-            max-width: 480px;
-            background: linear-gradient(145deg, #020617 0%, #0b1120 60%, #020617 100%);
-            border-radius: 20px;
-            padding: 28px 26px 26px;
-            box-shadow: 0 24px 60px rgba(0,0,0,0.75);
-            border: 1px solid rgba(148,163,184,0.3);
+            max-width: 460px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 28px;
+            padding: 40px;
+            box-shadow: 0 20px 60px -12px rgba(236, 72, 153, 0.15);
+            position: relative;
+            z-index: 10;
         }
+        
+        .auth-logo-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #EC4899 0%, #DB2777 100%);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 20px;
+            color: white;
+            box-shadow: 0 10px 25px -5px rgba(236, 72, 153, 0.3);
+        }
+        
         .auth-title {
             font-size: 28px;
             font-weight: 800;
             text-align: center;
-            margin-bottom: 6px;
-            background: linear-gradient(135deg, #4f46e5 0%, #22c55e 100%);
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #EC4899 0%, #DB2777 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            font-family: 'Outfit', sans-serif;
         }
+        
         .auth-sub {
             text-align: center;
-            color: #9ca3af;
-            font-size: 14px;
-            margin-bottom: 22px;
-        }
-        .auth-tabs {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 18px;
-            background: rgba(15,23,42,0.8);
-            padding: 4px;
-            border-radius: 999px;
-            border: 1px solid rgba(55,65,81,0.8);
-        }
-        .auth-tab {
-            flex: 1;
-            text-align: center;
-            padding: 8px 0;
-            font-size: 14px;
-            font-weight: 600;
-            border-radius: 999px;
-            cursor: pointer;
-            color: #9ca3af;
-        }
-        .auth-tab.active {
-            background: linear-gradient(135deg, #4f46e5 0%, #22c55e 100%);
-            color: #f9fafb;
-        }
-        .auth-footer {
-            margin-top: 18px;
-            text-align: center;
-            font-size: 12px;
-            color: #6b7280;
-        }
-        .auth-footer a {
-            color: #22c55e;
-            text-decoration: none;
+            color: #64748B;
+            font-size: 15px;
+            margin-bottom: 32px;
+            line-height: 1.5;
         }
         </style>
         """,
@@ -138,127 +131,127 @@ def show_login_page():
 
     def switch_tab(tab: str):
         st.session_state.auth_tab = tab
-        st.experimental_rerun()
+        st.rerun()
 
     # ---- WRAPPER & CARD ----
     st.markdown("<div class='auth-wrapper'><div class='auth-card'>", unsafe_allow_html=True)
 
-    st.markdown("<div class='auth-title'>Smart Resume Analyzer</div>", unsafe_allow_html=True)
-    st.markdown(
-        "<div class='auth-sub'>Sign in to access your AI resume insights, or create a new account.</div>",
-        unsafe_allow_html=True,
-    )
+    # Logo and Title
+    st.markdown("""
+        <div class='auth-logo'>
+            <div class='auth-logo-icon'>📄</div>
+        </div>
+        <div class='auth-title'>Smart Resume Analyzer</div>
+        <div class='auth-sub'>Sign in to access AI-powered resume insights</div>
+    """, unsafe_allow_html=True)
 
     # ---- TABS (LOGIN / SIGNUP) ----
     col_login, col_signup = st.columns(2)
     with col_login:
-        st.markdown(
-            f"<div class='auth-tabs'><div class='auth-tab {'active' if st.session_state.auth_tab=='login' else ''}' "
-            f"onclick=\"window.location.reload()\">Login</div></div>",
-            unsafe_allow_html=True,
-        )
-    with col_signup:
-        pass  # purely visual; the actual switching is done with buttons below
-
-    # Real tab switch buttons (no layout issues)
-    c1, c2 = st.columns(2)
-    with c1:
         if st.button("Login", key="auth_tab_login", use_container_width=True):
             switch_tab("login")
-    with c2:
-        if st.button("Sign up", key="auth_tab_signup", use_container_width=True):
+    with col_signup:
+        if st.button("Sign Up", key="auth_tab_signup", use_container_width=True):
             switch_tab("signup")
 
-    st.markdown("---")
+    st.markdown("<div style='height: 24px'></div>", unsafe_allow_html=True)
 
     # ---- LOGIN FORM ----
     if st.session_state.auth_tab == "login":
-        email = st.text_input("Email", key="login_email_page")
-        password = st.text_input("Password", type="password", key="login_password_page")
+        email = st.text_input("Email Address", key="login_email_page", placeholder="your.email@example.com")
+        password = st.text_input("Password", type="password", key="login_password_page", placeholder="Enter your password")
 
-        if email:
-            ok, msg = is_valid_email(email)
-            if not ok:
-                st.markdown(f"<div class='field-error'>{msg}</div>", unsafe_allow_html=True)
+        # Forgot password link
+        st.markdown("""
+            <div style="text-align: right; margin-top: -10px; margin-bottom: 20px;">
+                <a href="#" style="color: #EC4899; text-decoration: none; font-size: 14px; font-weight: 500;">Forgot password?</a>
+            </div>
+        """, unsafe_allow_html=True)
 
-        if password:
-            score, strength, feedback = get_password_strength(password)
-            st.markdown(
-                f"<div class='password-strength'><b>Password: {strength}</b></div>",
-                unsafe_allow_html=True,
-            )
-            if feedback:
-                st.caption(f"Needs: {', '.join(feedback)}")
-            else:
-                st.caption("✅ Strong password!")
-
-        if st.button("Login", key="login_submit_page", use_container_width=True):
+        if st.button("Sign In", key="login_submit_page", use_container_width=True, type="primary"):
             if not email or not password:
-                st.error("Please fill in all fields.")
+                st.error("⚠️ Please fill in all fields.")
             else:
-                ok, msg = is_valid_email(email)
-                if not ok:
-                    st.error(msg)
-                else:
-                    st.session_state.logged_in = True
-                    st.session_state.auth_mode = False   # leave auth page
-                    st.session_state.current_page = "Home"
-                    st.success("Logged in successfully!")
-                    st.experimental_rerun()
+                with st.spinner("Signing you in..."):
+                    user = db.verify_user(email, password)
+                    if user:
+                        st.session_state.logged_in = True
+                        st.session_state.user = user
+                        st.session_state.auth_mode = False
+                        
+                        # Handle Redirect
+                        target = st.session_state.get("redirect_target", "Landing")
+                        st.session_state.current_page = target
+                        st.session_state.redirect_target = None
+                        
+                        st.success(f"✅ Welcome back, {user['name']}!")
+                        time.sleep(0.8)
+                        st.rerun()
+                    else:
+                        st.error("❌ Invalid email or password. Please try again.")
 
         st.markdown(
-            "<div class='auth-footer'>Don't have an account? Use the signup tab above.</div>",
+            "<div class='auth-footer'>Don't have an account? <a href='#'>Sign up</a> to get started.</div>",
             unsafe_allow_html=True,
         )
 
     # ---- SIGNUP FORM ----
     else:
-        name = st.text_input("Full Name", key="signup_name_page")
-        email = st.text_input("Email", key="signup_email_page")
-        password = st.text_input("Password", type="password", key="signup_password_page")
-        confirm = st.text_input("Confirm Password", type="password", key="signup_confirm_page")
+        name = st.text_input("Full Name", key="signup_name_page", placeholder="John Doe")
+        email = st.text_input("Email Address", key="signup_email_page", placeholder="your.email@example.com")
+        password = st.text_input("Password", type="password", key="signup_password_page", placeholder="Create a strong password")
+        confirm = st.text_input("Confirm Password", type="password", key="signup_confirm_page", placeholder="Confirm your password")
 
-        if email:
-            ok, msg = is_valid_email(email)
-            if not ok:
-                st.markdown(f"<div class='field-error'>{msg}</div>", unsafe_allow_html=True)
-
+        # Password strength indicator
         if password:
             score, strength, feedback = get_password_strength(password)
-            st.markdown(
-                f"<div class='password-strength'><b>Password: {strength}</b></div>",
-                unsafe_allow_html=True,
-            )
+            strength_class = "strength-weak" if score < 3 else "strength-medium" if score < 4 else "strength-strong"
+            st.markdown(f"""
+                <div class="password-strength {strength_class}">
+                    Password Strength: {strength}
+                </div>
+            """, unsafe_allow_html=True)
             if feedback:
-                st.caption(f"Needs: {', '.join(feedback)}")
+                st.caption(f"Add: {', '.join(feedback)}")
 
-        if password and confirm and password != confirm:
-            st.markdown("<div class='field-error'>Passwords do not match</div>", unsafe_allow_html=True)
-
-        if st.button("Create Account", key="signup_submit_page", use_container_width=True):
+        if st.button("Create Account", key="signup_submit_page", use_container_width=True, type="primary"):
             if not all([name, email, password, confirm]):
-                st.error("Please fill in all fields.")
+                st.error("⚠️ Please fill in all fields.")
             elif password != confirm:
-                st.error("Passwords do not match.")
+                st.error("❌ Passwords do not match. Please try again.")
+            elif len(password) < 8:
+                st.error("❌ Password must be at least 8 characters long.")
             else:
                 ok, msg = is_valid_email(email)
                 if not ok:
-                    st.error(msg)
+                    st.error(f"❌ {msg}")
                 else:
-                    st.session_state.logged_in = True
-                    st.session_state.auth_mode = False   # leave auth page
-                    st.session_state.current_page = "Home"
-                    st.success("Account created successfully!")
-                    st.experimental_rerun()
+                    with st.spinner("Creating your account..."):
+                        success, msg = db.create_user(email, password, name)
+                        if success:
+                            # Auto-login
+                            user = db.verify_user(email, password)
+                            st.session_state.logged_in = True
+                            st.session_state.user = user
+                            st.session_state.auth_mode = False
+                            
+                            # Handle Redirect
+                            target = st.session_state.get("redirect_target", "Landing")
+                            st.session_state.current_page = target
+                            st.session_state.redirect_target = None
+                            
+                            st.success("🎉 Account created successfully!")
+                            time.sleep(0.8)
+                            st.rerun()
+                        else:
+                            st.error(f"❌ {msg}")
 
         st.markdown(
-            "<div class='auth-footer'>Already have an account? Switch to the login tab above.</div>",
+            "<div class='auth-footer'>Already have an account? <a href='#'>Sign in</a> instead.</div>",
             unsafe_allow_html=True,
         )
 
-    # ---- WRAPPER CLOSE ----
-    st.markdown(
-        "<div class='auth-footer'>By continuing you agree to our <a href='#'>Terms</a> and <a href='#'>Privacy Policy</a>.</div>",
-        unsafe_allow_html=True,
-    )
     st.markdown("</div></div>", unsafe_allow_html=True)
+
+# Alias for app.py import compatibility
+show_login = show_login_page

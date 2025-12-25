@@ -2,3 +2,7 @@ streamlit
 pymupdf
 streamlit-lottie
 language-tool-python
+pandas
+scikit-learn
+fpdf2
+pdfplumber

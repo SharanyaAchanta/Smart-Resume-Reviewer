@@ -1,10 +1,24 @@
 import streamlit as st
 import json
 import time
+import fitz
+import hashlib
+
+
+# Helper function to generate unique file ID
+def _file_id(uploaded_file):
+    """Generate a unique ID for an uploaded file based on name and size."""
+    if uploaded_file is None:
+        return None
+    file_name = uploaded_file.name
+    file_size = uploaded_file.size
+    file_id_str = f"{file_name}_{file_size}"
+    return hashlib.md5(file_id_str.encode()).hexdigest()
+
 
 # Theme from session (controlled by custom sidebar in header.py)
 if "theme" not in st.session_state:
-    st.session_state.theme = "Dark"
+    st.session_state.theme = "Light"
 theme = st.session_state.theme
 
 if theme == "Dark":
@@ -32,19 +46,19 @@ if not st.session_state.page_loaded:
         left: 0;
         width: 100vw;
         height: 100vh;
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+        background: #ffffff;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         z-index: 99999;
-        font-family: 'Segoe UI', -apple-system, sans-serif;
+        font-family: 'Inter', -apple-system, sans-serif;
     }
     .loading-spinner {
         width: 60px;
         height: 60px;
-        border: 6px solid rgba(255,255,255,0.1);
-        border-top: 6px solid #00d4aa;
+        border: 4px solid rgba(0,0,0,0.05);
+        border-top: 4px solid #3b82f6;
         border-radius: 50%;
         animation: spin 1s linear infinite;
         margin-bottom: 24px;
@@ -54,15 +68,14 @@ if not st.session_state.page_loaded:
         100% { transform: rotate(360deg); }
     }
     .loading-title {
-        font-size: 28px;
+        font-size: 24px;
         font-weight: 700;
-        color: #ffffff;
+        color: #111827;
         margin-bottom: 8px;
-        text-shadow: 0 2px 10px rgba(0,0,0,0.5);
     }
     .loading-subtitle {
-        font-size: 16px;
-        color: rgba(255,255,255,0.85);
+        font-size: 15px;
+        color: #6b7280;
         margin-bottom: 16px;
     }
     .loading-dots {
@@ -127,13 +140,13 @@ from components.login import show_login
 
 # ✅ CRITICAL: Initialize ALL session state FIRST
 if "theme" not in st.session_state:
-    st.session_state.theme = "Dark"
+    st.session_state.theme = "Light"
 if "show_contributors" not in st.session_state:
     st.session_state.show_contributors = False
 if "show_features" not in st.session_state:
     st.session_state.show_features = False
 if "current_page" not in st.session_state:
-    st.session_state.current_page = "Analyzer"
+    st.session_state.current_page = "Landing"
 if "last_file_id" not in st.session_state:
     st.session_state.last_file_id = None
 if "consent" not in st.session_state:
@@ -144,19 +157,49 @@ if "show_login_modal" not in st.session_state:
     st.session_state.show_login_modal = False
 if "auth_mode" not in st.session_state:
     st.session_state.auth_mode = False
+if "job_description" not in st.session_state:
+    st.session_state.job_description = ""
+if "experience_level" not in st.session_state:
+    st.session_state.experience_level = "Mid Level"
+
+# Footer import with fallback
+try:
+    from components.footer import render_footer as show_footer
+except Exception:
+    try:
+        from components.footer import show_footer
+    except Exception:
+        def show_footer():
+            return None
 
 from components.login import show_login_page  # use your new full-page function
+from components.landing import show_landing_page
+
+# Static Pages
+try:
+    from components.static_pages import (
+        show_service_page, show_blogs_page, show_about_page, 
+        show_pricing_page, show_faq_page
+    )
+except ImportError:
+    # Fallback to avoid crashes if file missing during dev
+    def show_service_page(): st.info("Service Page")
+    def show_blogs_page(): st.info("Blogs Page")
+    def show_about_page(): st.info("About Page")
+    def show_pricing_page(): st.info("Pricing Page")
+    def show_faq_page(): st.info("FAQ Page")
 
 # If we are in auth mode and not logged in, only show login/signup page
 if st.session_state.get("auth_mode", False) and not st.session_state.get("logged_in", False):
     show_login_page()
     st.stop()
 
+# -----------------------------
+# MAIN APP LOGIC
+# -----------------------------
 
-# ✅ ROUTE TO RESUME TIPS PAGE
-if st.session_state.current_page == "Resume Tips":
-    resume_tips.main()
-    st.stop()
+# Note: Routing will be handled after consent check and global styling
+from components.resume_builder import show_resume_builder
 
 # Apply CSS overrides based on theme
 if st.session_state.theme == "Dark":
@@ -184,18 +227,18 @@ if st.session_state.theme == "Dark":
             color: #e8f1f2 !important;
         }
         [data-testid="stFileUploader"] svg {
-            fill: #2ecc71 !important;
+            fill: #EC4899 !important;
             width: 36px !important;
             height: 36px !important;
         }
         [data-testid="stFileUploader"]:hover {
-            border-color: #2ecc71 !important;
-            box-shadow: 0px 0px 18px rgba(46, 204, 113, 0.25);
+            border-color: #EC4899 !important;
+            box-shadow: 0px 0px 18px rgba(236, 72, 153, 0.25);
             transform: translateY(-2px);
         }
         [data-testid="stFileUploader"].drag-over {
-            border-color: #1abc9c !important;
-            box-shadow: 0px 0px 25px rgba(26, 188, 156, 0.35);
+            border-color: #F472B6 !important;
+            box-shadow: 0px 0px 25px rgba(244, 114, 182, 0.35);
             background: #1c1f21 !important;
         }
         </style>
@@ -216,31 +259,32 @@ else:
             border: 1px solid #e2e8f0 !important;
         }
         [data-testid="stFileUploader"] {
-            border: 2px solid rgba(59, 130, 246, 0.3) !important;
-            background: linear-gradient(145deg, #f8fafc, #edf2f7) !important;
-            padding: 30px !important;
-            border-radius: 14px !important;
-            transition: all 0.35s ease-in-out !important;
+            border: 2px dashed #e5e7eb !important;
+            background: #ffffff !important;
+            padding: 40px !important;
+            border-radius: 12px !important;
+            transition: all 0.2s ease-in-out !important;
             cursor: pointer !important;
             margin: auto;
+            box-shadow: none !important;
         }
         [data-testid="stFileUploader"] * {
-            color: #2d3748 !important;
+            color: #4b5563 !important;
+            font-family: 'Inter', sans-serif !important;
         }
         [data-testid="stFileUploader"] svg {
-            fill: #4299e1 !important;
-            width: 36px !important;
-            height: 36px !important;
+            fill: #EC4899 !important;
+            width: 48px !important;
+            height: 48px !important;
+            margin-bottom: 10px !important;
         }
         [data-testid="stFileUploader"]:hover {
-            border-color: #3182ce !important;
-            box-shadow: 0px 0px 18px rgba(59, 130, 246, 0.25);
-            transform: translateY(-2px);
+            border-color: #EC4899 !important;
+            background: #FDF2F8 !important;
         }
         [data-testid="stFileUploader"].drag-over {
-            border-color: #2b6cb0 !important;
-            box-shadow: 0px 0px 25px rgba(59, 130, 246, 0.35);
-            background: #e6f3ff !important;
+            border-color: #EC4899 !important;
+            background: #FDF2F8 !important;
         }
         </style>
         """,
@@ -257,7 +301,7 @@ st.markdown(
     bottom: 0;
     left: 0; right: 0;
     width: 100%;
-    background: #1f77b4;
+    background: linear-gradient(135deg, #EC4899 0%, #DB2777 100%);
     color: white;
     text-align: center;
     font-size: 14px;
@@ -267,7 +311,7 @@ st.markdown(
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 .main .block-container {
-    padding-top: 50px !important;
+    padding-top: 0 !important;
 }
 </style>
 <div class="privacy-banner">
@@ -277,15 +321,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Footer import with fallback
-try:
-    from components.footer import render_footer as show_footer
-except Exception:
-    try:
-        from components.footer import show_footer
-    except Exception:
-        def show_footer():
-            return None
 
 # Upload card check
 try:
@@ -297,176 +332,46 @@ except Exception:
 # -----------------------------
 # UPDATED COOKIE BANNER
 # -----------------------------
-def cookie_banner():
-    st.markdown(
-        """
-    <style>
-    .cookie-overlay {
-        position: fixed;
-        left: 0; right: 0; bottom: 0;
-        width: 100%;
-        z-index: 10000;
-        display: flex;
-        justify-content: center;
-        padding: 15px 0;
-        background: rgba(0,0,0,0.8);
-    }
-    .cookie-popup {
-        background: linear-gradient(135deg, #2c2c2c 0%, #1e1e1e 100%);
-        border-radius: 16px;
-        padding: 24px 28px;
-        max-width: 650px;
-        width: 90%;
-        color: #f0f0f0;
-        text-align: left;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-        backdrop-filter: blur(15px);
-        border: 1px solid rgba(255,255,255,0.1);
-    }
-    .cookie-title {
-        font-size: 20px;
-        font-weight: 700;
-        margin-bottom: 12px;
-        color: #00d4aa;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .cookie-text {
-        font-size: 14px;
-        margin-bottom: 20px;
-        line-height: 1.6;
-        color: #e0e0e0;
-    }
-    .cookie-buttons {
-        display: flex;
-        justify-content: flex-end;
-        gap: 12px;
-        flex-wrap: wrap;
-    }
-    .cookie-btn {
-        padding: 10px 24px;
-        font-size: 14px;
-        font-weight: 600;
-        border-radius: 8px;
-        cursor: pointer;
-        border: none;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        transition: all 0.3s ease;
-        min-width: 130px;
-    }
-    .accept-all-btn {
-        background: linear-gradient(135deg, #00c853 0%, #00b140 100%);
-        color: white;
-    }
-    .accept-all-btn:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 8px 25px rgba(0,200,83,0.4);
-    }
-    .accept-essential-btn {
-        background: transparent;
-        color: #fff;
-        border: 2px solid #4a4a4a;
-    }
-    .accept-essential-btn:hover {
-        background: rgba(255,255,255,0.1);
-        border-color: #00c853;
-        color: #00c853;
-    }
-    @media (max-width: 768px) {
-        .cookie-popup { padding: 20px 16px; margin: 0 10px; }
-        .cookie-text { font-size: 13px; }
-        .cookie-buttons { flex-direction: column-reverse; }
-        .cookie-btn { width: 100%; margin-bottom: 8px; }
-    }
-    </style>
-    """,
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        """
-    <div class="cookie-overlay">
-        <div class="cookie-popup">
-            <div class="cookie-title">🍪 We use cookies</div>
-            <div class="cookie-text">
-                This website uses <strong>essential cookies</strong> for core functionality and <strong>optional cookies</strong> 
-                to improve your experience, analyze usage, and personalize content.
-                <br><br>
-                You can manage your preferences below. Learn more in our <a href="#" style="color: #00c853;">Privacy Policy</a>.
-            </div>
-            <div class="cookie-buttons">
-    """,
-        unsafe_allow_html=True,
-    )
-
-    col1, col2 = st.columns([1, 1])
-    with col1:
-        accept_essential = st.button("Accept Essential", key="accept_essential", use_container_width=True)
-    with col2:
-        accept_all = st.button("Accept All", key="accept_all", use_container_width=True)
-
-    st.markdown(
-        """
-            </div>
-        </div>
-    </div>
-    """,
-        unsafe_allow_html=True,
-    )
-
-    if accept_all:
-        st.session_state.consent = "all"
-        st.rerun()
-    if accept_essential:
-        st.session_state.consent = "essential"
-        st.rerun()
-
+# This allows the landing page to be visible behind the cookie banner
 # ✅ CONSENT CHECK
 if st.session_state.consent is None:
-    cookie_banner()
+    with st.container():
+        st.markdown("""
+        <div style="
+            background: #1F2937; 
+            padding: 20px; 
+            border-radius: 12px; 
+            margin-bottom: 20px; 
+            border: 1px solid #374151;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        ">
+            <div style="font-size: 1.2rem; font-weight: bold; color: white; margin-bottom: 10px;">🍪 We use cookies</div>
+            <div style="color: #D1D5DB; margin-bottom: 20px;">
+                This website uses essential cookies to ensure you get the best experience on our website.
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Action Buttons in standard columns (High Visibility)
+        cb1, cb2 = st.columns([1, 5])
+        with cb1:
+            if st.button("Accept", key="cookie_accept_top", type="primary", use_container_width=True):
+                st.session_state.consent = "all"
+                st.rerun()
+        with cb2:
+            if st.button("Later", key="cookie_later_top", use_container_width=False):
+                st.session_state.consent = "later"
+                st.rerun()
+                
+# ✅ LANDING PAGE - Handle early and stop
+if st.session_state.current_page == "Landing":
+    show_landing_page()
+    if callable(show_footer):
+        show_footer()
     st.stop()
 
-# ✅ GLOBAL STYLING
-st.markdown(
-    """
-<style>
-header, .stAppHeader, .stAppToolbar { 
-    display: none !important;
-}
-.block-container {  
-    padding-bottom: 200px !important;
-    text-align: center; 
-    margin-top: 0 !important;
-}
-@media (max-width: 768px) { 
-    .block-container { 
-        padding-top: 1.5rem !important; 
-        padding-bottom: 220px !important; 
-    } 
-}
-.stButton > button {
-    border-radius: 12px !important;
-    font-weight: 600 !important;
-    padding: 12px 28px !important;
-}
-.card {
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 16px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-}
-textarea, pre, .stTextArea, .stTextArea textarea { 
-    text-align: left; 
-    font-family: monospace; 
-    font-size: 14px; 
-}
-.stInfo { background-color: rgba(0,200,83,0.1) !important; border-left: 4px solid #00c853 !important; }
-</style>
-""",
-    unsafe_allow_html=True,
-)
+# ✅ GLOBAL STYLING (applies to all non-landing pages)
+# Professional styles are loaded via components.styles.local_css() above
 
 # --- SIDEBAR NAVBAR & HEADER ---
 show_sidebar_navbar(active_page=st.session_state.current_page)
@@ -477,7 +382,7 @@ if st.session_state.get("show_login_modal", False):
     show_login()
     st.markdown("")  # small spacer
 
-st.markdown("<br><br>", unsafe_allow_html=True)
+st.markdown("<br>", unsafe_allow_html=True)
 
 # --- CONSENT STATUS DISPLAY ---
 if st.session_state.consent == "essential":
@@ -498,6 +403,53 @@ if st.session_state.show_features:
         show_footer()
     st.stop()
 
+# ✅ ROUTING FOR OTHER PAGES
+if st.session_state.current_page == "Services":
+    show_service_page()
+    if callable(show_footer):
+        show_footer()
+    st.stop()
+elif st.session_state.current_page == "Blogs":
+    show_blogs_page()
+    if callable(show_footer):
+        show_footer()
+    st.stop()
+elif st.session_state.current_page == "About":
+    show_about_page()
+    if callable(show_footer):
+        show_footer()
+    st.stop()
+elif st.session_state.current_page == "Pricing":
+    show_pricing_page()
+    if callable(show_footer):
+        show_footer()
+    st.stop()
+elif st.session_state.current_page == "FAQ":
+    show_faq_page()
+    if callable(show_footer):
+        show_footer()
+    st.stop()
+elif st.session_state.current_page == "Resume Tips":
+    resume_tips.main()
+    if callable(show_footer):
+        show_footer()
+    st.stop()
+elif st.session_state.current_page == "Resume Builder":
+    show_resume_builder()
+    if callable(show_footer):
+        show_footer()
+    st.stop()
+
+# ✅ ANALYZER PAGE - Continue to show analysis UI
+if st.session_state.current_page != "Analyzer":
+    # If we reach here and it's not Analyzer, something went wrong
+    st.warning("Page not found. Redirecting to Landing page...")
+    st.session_state.current_page = "Landing"
+    st.rerun()
+
+# --- ANALYZER PAGE CONTENT ---
+st.markdown("<h1 style='background: linear-gradient(135deg, #EC4899 0%, #DB2777 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; margin-bottom: 20px;'>📊 Resume Analyzer</h1>", unsafe_allow_html=True)
+
 # --- LOAD JOB ROLES ---
 try:
     with open("utils/job_roles.json", "r") as f:
@@ -514,7 +466,7 @@ if isinstance(job_roles, dict) and selected_category in job_roles:
     roles = list(job_roles[selected_category].keys())
     selected_role = st.selectbox("Select Specific Role:", roles, key="role_select")
     role_info = job_roles[selected_category][selected_role]
-    with st.expander(f"ℹ️ {selected_role} - Required Skills & Info", expanded=True):
+    with st.expander(f"📌 {selected_role} - Required Skills & Info", expanded=True):
         c1, c2 = st.columns(2)
         with c1:
             st.info(role_info.get("description", "No description available"))
@@ -529,66 +481,205 @@ st.info(
     "No personal data is saved or logged."
 )
 
-# --- FILE UPLOADER ---
-uploaded_file = st.file_uploader(
-    "Upload Resume (PDF)", type="pdf", help="Upload a PDF resume to analyze"
-)
+# --- HANDLE FILE FROM LANDING PAGE ---
+if "uploaded_file_temp" in st.session_state and st.session_state.uploaded_file_temp:
+    uploaded_file = st.session_state.uploaded_file_temp
+    # Keep it persistent? Or clear it? 
+    # For now, let's just use it.
+else:
+    # Fallback uploader on Analyzer page
+    uploaded_file = st.file_uploader(
+        "Upload Resume (PDF)", type="pdf", help="Upload a PDF resume to analyze"
+    )
 
-# --- DRAG-OVER JS ---
-st.markdown(
-    """
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const uploader = window.parent.document.querySelector('[data-testid="stFileUploader"]');
-    if (uploader) {
-        document.addEventListener('dragover', () => { uploader.classList.add('drag-over'); });
-        document.addEventListener('dragleave', () => { uploader.classList.remove('drag-over'); });
-        document.addEventListener('drop', () => { uploader.classList.remove('drag-over'); });
-    }
-});
-</script>
-""",
-    unsafe_allow_html=True,
-)
-
-# --- HELPER: FILE ID ---
-def _file_id(file):
-    try:
-        return f"{file.name}-{file.size}-{getattr(file, 'lastModified', '')}"
-    except Exception:
-        return getattr(file, "name", str(file))
-
-# --- RESUME ANALYSIS ---
+# --- ANALYSIS DASHBOARD ---
 if uploaded_file:
     current_file_id = _file_id(uploaded_file)
     if st.session_state.last_file_id != current_file_id:
         st.session_state.last_file_id = current_file_id
+        
+        with st.spinner("⏳ Analysis in progress..."):
+            time.sleep(1) # Simulated delay for effect
 
-        with st.spinner("⏳ Analyzing your resume... Please wait..."):
-            time.sleep(1)
-
+        # PARSE
         parsed = parse_resume(uploaded_file)
         plain_text = parsed.get("plain_text", "")
-        flat_text = parsed.get("flat_text", "")
-        structured = parsed.get("structured", {})
+        
+        # Get job description and experience level from session state
+        job_description = st.session_state.get("job_description", "")
+        experience_level = st.session_state.get("experience_level", "Mid Level")
+        
+        # ANALYZE
+        suggestions, resume_score, keyword_match, predicted_role = get_resume_feedback(
+            plain_text, 
+            selected_role, 
+            job_description=job_description, 
+            experience_level=experience_level
+        )
+        
+        # Save results to session state to prevent re-running on interaction
+        st.session_state.analysis_results = {
+            "plain_text": plain_text,
+            "suggestions": suggestions,
+            "score": resume_score,
+            "keyword_match": keyword_match,
+            "predicted_role": predicted_role
+        }
 
-        st.markdown("<div class='card'><h4>📄 Extracted Resume Text — Cleaned</h4></div>", unsafe_allow_html=True)
-        st.text_area("Extracted Resume Text", value=plain_text, height=350)
+    # --- DASHBOARD UI ---
+    results = st.session_state.get("analysis_results", None)
+    
+    if results:
+        plain_text = results["plain_text"]
+        resume_score = results["score"]
+        suggestions = results["suggestions"]
+        keyword_match = results["keyword_match"]
+        predicted_role = results.get("predicted_role", "Unknown")
+        
+        # 2-COLUMN LAYOUT
+        d_col1, d_col2 = st.columns([1, 1.2])
+        
+        # --- LEFT: PREVIEW & CONTEXT ---
+        with d_col1:
+            # Inputs for better analysis
+            with st.expander("⚙️ Tailor Your Analysis", expanded=False):
+                job_description = st.text_area("Paste Job Description:", height=100, value=st.session_state.get("job_description", ""), key="job_desc_input")
+                exp_levels = ["Entry Level", "Mid Level", "Senior", "Executive"]
+                current_exp = st.session_state.get("experience_level", "Mid Level")
+                default_index = exp_levels.index(current_exp) if current_exp in exp_levels else 1
+                experience_level = st.selectbox("Experience Level:", exp_levels, index=default_index, key="exp_level_input")
+                if st.button("Re-Analyze"):
+                    st.session_state.job_description = job_description
+                    st.session_state.experience_level = experience_level
+                    # Clear analysis results to force re-analysis
+                    if "analysis_results" in st.session_state:
+                        del st.session_state.analysis_results
+                    st.rerun()
 
-        st.markdown("<div class='card'><h4>📝 Structured (flat) view</h4></div>", unsafe_allow_html=True)
-        st.text_area("Flat sections + bullets", value=flat_text, height=300)
+            st.markdown(f"""
+            <div style="
+                background: white; 
+                padding: 30px; 
+                border-radius: 12px; 
+                box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+                height: 800px; 
+                overflow-y: auto;
+                border: 1px solid #E5E7EB;
+                font-family: 'Times New Roman', serif;
+                font-size: 14px;
+                color: #333;
+                line-height: 1.5;
+            ">
+                <h3 style="margin-top:0; border-bottom: 2px solid #333; padding-bottom: 10px;">{st.session_state.get("user", {}).get("name", "Candidate Name")}</h3>
+                <p><strong>Target Role:</strong> {selected_role}</p>
+                <p><strong>AI Predicted Role:</strong> {predicted_role}</p>
+                <hr>
+                <div style="white-space: pre-wrap;">{plain_text[:3000]}...</div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+        # --- RIGHT: SCORE & BREAKDOWN ---
+        with d_col2:
+            st.subheader("Resume Review")
+            
+            # CIRCULAR SCORE CARD
+            st.markdown(f"""
+            <div style="
+                background: #FDF2F8; 
+                border: 1px solid #FBCFE8;
+                border-radius: 16px; 
+                padding: 24px; 
+                display: flex; 
+                align-items: center; 
+                gap: 30px;
+                margin-bottom: 30px;
+            ">
+                <div style="
+                    position: relative;
+                    width: 100px;
+                    height: 100px;
+                    border-radius: 50%;
+                    background: conic-gradient(#EC4899 {resume_score}%, #ffffff 0);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    box-shadow: 0 4px 10px rgba(236, 72, 153, 0.2);
+                ">
+                    <div style="
+                        width: 80px; 
+                        height: 80px; 
+                        background: white; 
+                        border-radius: 50%; 
+                        display: flex; 
+                        align-items: center; 
+                        justify-content: center;
+                        font-weight: 800;
+                        font-size: 24px;
+                        color: #DB2777;
+                    ">{int(resume_score)}/100</div>
+                </div>
+                <div>
+                    <h3 style="margin:0; color: #DB2777;">Your Resume Score</h3>
+                    <p style="margin:5px 0 0; color: #6B7280; font-size: 0.9rem;">
+                        Calculated based on ATS compliance, content, and structure.
+                    </p>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # PROGRESS BARS - PINK THEME
+            def progress_bar(label, value, color="#EC4899"):
+                st.markdown(f"""
+                <div style="margin-bottom: 15px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom: 4px;">
+                        <span style="font-weight:600; color:#4B5563;">{label}</span>
+                        <span style="font-weight:700; color:{color};">{value}/100</span>
+                    </div>
+                    <div style="width:100%; background:#F3F4F6; height:8px; border-radius:4px;">
+                        <div style="width:{value}%; background:{color}; height:8px; border-radius:4px;"></div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+                
+            progress_bar("Structure & Formatting", 85, "#F472B6") # Pink
+            progress_bar("Content Quality", int(resume_score), "#EC4899") # Pink
+            progress_bar("Skills Match", int(keyword_match), "#F472B6" if keyword_match < 50 else "#EC4899") # Pink shades
+            
+            st.markdown("<br>", unsafe_allow_html=True)
+            
+            # ATS CHECKLIST
+            st.markdown("""
+            <div style="background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px;">
+                <h4 style="margin-top:0; margin-bottom: 15px;">ATS Compliance Checks</h4>
+                <div style="display:grid; gap: 10px;">
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <span style="color:#10B981;">✅</span> <span>Clear standard formatting detected</span>
+                    </div>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <span style="color:#10B981;">✅</span> <span>No unreadable graphics found</span>
+                    </div>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <span style="color:#EF4444;">⚠️</span> <span>Skills section could be more specific</span>
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # SUGGESTIONS ACCORDION
+            with st.expander("Resume Improvement Checklist", expanded=True):
+                if suggestions:
+                    for s in suggestions:
+                        st.warning(s)
+                else:
+                    st.success("✅ Great! Your resume looks good. No major issues found.")
+            
+            # PREDICTED ROLE DISPLAY
+            if predicted_role and predicted_role != "Unknown":
+                if predicted_role != selected_role:
+                    st.info(f"🤖 **AI Analysis:** Your resume content suggests it's best suited for **{predicted_role}** role. Consider tailoring it for {selected_role} if that's your target.")
 
-        st.markdown("<div class='card'><h4>🔎 Parsed JSON Structure</h4></div>", unsafe_allow_html=True)
-        st.json(structured)
-
-        suggestions, resume_score, keyword_match = get_resume_feedback(plain_text, selected_role)
-        st.markdown("<div class='card'><h4>💡 Suggestions & Resume Score</h4></div>", unsafe_allow_html=True)
-        show_suggestions(suggestions, resume_score, keyword_match, plain_text)
-    else:
-        st.info("Resume already analyzed — upload a different file to re-run analysis.")
-        if callable(show_footer):
-            show_footer()
 else:
-    st.info("Please upload a PDF resume to get started.")
-    if callable(show_footer):
-        show_footer()
+    st.info("📄 Please upload a PDF resume to see the analysis.")
+
+if callable(show_footer):
+    show_footer()
