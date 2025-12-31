@@ -1,0 +1,17 @@
+﻿diff --git a/app.py b/app.py
+index 1111111..2222222 100644
+--- a/app.py
++++ b/app.py
+@@
++from datetime import datetime
++import streamlit as st
++
++# ---------------------------
++# SESSION STATE INITIALIZATION
++# ---------------------------
++if "review_history" not in st.session_state:
++    st.session_state.review_history = []
++
++if "selected_review" not in st.session_state:
++    st.session_state.selected_review = None
++
