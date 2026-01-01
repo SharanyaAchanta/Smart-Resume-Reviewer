@@ -1,8 +1,9 @@
-import streamlit as st
+﻿import streamlit as st
 import json
 import time
 import fitz
 import hashlib
+import pandas as pd
 
 
 # Helper function to generate unique file ID
@@ -129,6 +130,7 @@ except Exception:
     pass
 
 # --- IMPORT COMPONENTS ---
+from utils.resume_history import save_review, show_history_ui
 from utils.resume_parser import parse_resume
 from utils.analyze_resume import get_resume_feedback
 from components.header import show_header, show_sidebar_navbar
@@ -200,6 +202,35 @@ if st.session_state.get("auth_mode", False) and not st.session_state.get("logged
 
 # Note: Routing will be handled after consent check and global styling
 from components.resume_builder import show_resume_builder
+
+st.markdown("""
+<style>
+
+header nav {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+
+header nav * {
+    white-space: nowrap !important;
+}
+
+header nav ul {
+    display: flex !important;
+    gap: 18px !important;
+}
+
+/* Fix text breaking like Hom
+e / Servi
+ces */
+header nav li, header nav a, header nav span {
+    white-space: nowrap !important;
+}
+
+</style>
+""", unsafe_allow_html=True)
 
 # Apply CSS overrides based on theme
 if st.session_state.theme == "Dark":
@@ -448,6 +479,9 @@ if st.session_state.current_page != "Analyzer":
     st.rerun()
 
 # --- ANALYZER PAGE CONTENT ---
+# Show Resume History in Sidebar
+show_history_ui()
+
 st.markdown("<h1 style='background: linear-gradient(135deg, #EC4899 0%, #DB2777 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; margin-bottom: 20px;'>📊 Resume Analyzer</h1>", unsafe_allow_html=True)
 
 # --- LOAD JOB ROLES ---
@@ -461,6 +495,7 @@ except Exception:
 st.subheader("Choose Job Role")
 categories = list(job_roles.keys()) if isinstance(job_roles, dict) else ["Default Role"]
 selected_category = st.selectbox("Select Job Category:", categories)
+
 
 if isinstance(job_roles, dict) and selected_category in job_roles:
     roles = list(job_roles[selected_category].keys())
@@ -526,160 +561,178 @@ if uploaded_file:
             "predicted_role": predicted_role
         }
 
-    # --- DASHBOARD UI ---
-    results = st.session_state.get("analysis_results", None)
-    
-    if results:
-        plain_text = results["plain_text"]
-        resume_score = results["score"]
-        suggestions = results["suggestions"]
-        keyword_match = results["keyword_match"]
-        predicted_role = results.get("predicted_role", "Unknown")
-        
-        # 2-COLUMN LAYOUT
-        d_col1, d_col2 = st.columns([1, 1.2])
-        
-        # --- LEFT: PREVIEW & CONTEXT ---
-        with d_col1:
-            # Inputs for better analysis
-            with st.expander("⚙️ Tailor Your Analysis", expanded=False):
-                job_description = st.text_area("Paste Job Description:", height=100, value=st.session_state.get("job_description", ""), key="job_desc_input")
-                exp_levels = ["Entry Level", "Mid Level", "Senior", "Executive"]
-                current_exp = st.session_state.get("experience_level", "Mid Level")
-                default_index = exp_levels.index(current_exp) if current_exp in exp_levels else 1
-                experience_level = st.selectbox("Experience Level:", exp_levels, index=default_index, key="exp_level_input")
-                if st.button("Re-Analyze"):
-                    st.session_state.job_description = job_description
-                    st.session_state.experience_level = experience_level
-                    # Clear analysis results to force re-analysis
-                    if "analysis_results" in st.session_state:
-                        del st.session_state.analysis_results
-                    st.rerun()
+# --- DASHBOARD UI ---
+results = st.session_state.get("analysis_results", None)
 
-            st.markdown(f"""
-            <div style="
-                background: white; 
-                padding: 30px; 
-                border-radius: 12px; 
-                box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
-                height: 800px; 
-                overflow-y: auto;
-                border: 1px solid #E5E7EB;
-                font-family: 'Times New Roman', serif;
-                font-size: 14px;
-                color: #333;
-                line-height: 1.5;
-            ">
-                <h3 style="margin-top:0; border-bottom: 2px solid #333; padding-bottom: 10px;">{st.session_state.get("user", {}).get("name", "Candidate Name")}</h3>
-                <p><strong>Target Role:</strong> {selected_role}</p>
-                <p><strong>AI Predicted Role:</strong> {predicted_role}</p>
-                <hr>
-                <div style="white-space: pre-wrap;">{plain_text[:3000]}...</div>
-            </div>
-            """, unsafe_allow_html=True)
-            
-        # --- RIGHT: SCORE & BREAKDOWN ---
-        with d_col2:
-            st.subheader("Resume Review")
-            
-            # CIRCULAR SCORE CARD
-            st.markdown(f"""
-            <div style="
-                background: #FDF2F8; 
-                border: 1px solid #FBCFE8;
-                border-radius: 16px; 
-                padding: 24px; 
-                display: flex; 
-                align-items: center; 
-                gap: 30px;
-                margin-bottom: 30px;
-            ">
-                <div style="
-                    position: relative;
-                    width: 100px;
-                    height: 100px;
-                    border-radius: 50%;
-                    background: conic-gradient(#EC4899 {resume_score}%, #ffffff 0);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    box-shadow: 0 4px 10px rgba(236, 72, 153, 0.2);
-                ">
-                    <div style="
-                        width: 80px; 
-                        height: 80px; 
-                        background: white; 
-                        border-radius: 50%; 
-                        display: flex; 
-                        align-items: center; 
-                        justify-content: center;
-                        font-weight: 800;
-                        font-size: 24px;
-                        color: #DB2777;
-                    ">{int(resume_score)}/100</div>
-                </div>
-                <div>
-                    <h3 style="margin:0; color: #DB2777;">Your Resume Score</h3>
-                    <p style="margin:5px 0 0; color: #6B7280; font-size: 0.9rem;">
-                        Calculated based on ATS compliance, content, and structure.
-                    </p>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # PROGRESS BARS - PINK THEME
-            def progress_bar(label, value, color="#EC4899"):
-                st.markdown(f"""
-                <div style="margin-bottom: 15px;">
-                    <div style="display:flex; justify-content:space-between; margin-bottom: 4px;">
-                        <span style="font-weight:600; color:#4B5563;">{label}</span>
-                        <span style="font-weight:700; color:{color};">{value}/100</span>
-                    </div>
-                    <div style="width:100%; background:#F3F4F6; height:8px; border-radius:4px;">
-                        <div style="width:{value}%; background:{color}; height:8px; border-radius:4px;"></div>
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-                
-            progress_bar("Structure & Formatting", 85, "#F472B6") # Pink
-            progress_bar("Content Quality", int(resume_score), "#EC4899") # Pink
-            progress_bar("Skills Match", int(keyword_match), "#F472B6" if keyword_match < 50 else "#EC4899") # Pink shades
-            
-            st.markdown("<br>", unsafe_allow_html=True)
-            
-            # ATS CHECKLIST
-            st.markdown("""
-            <div style="background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px;">
-                <h4 style="margin-top:0; margin-bottom: 15px;">ATS Compliance Checks</h4>
-                <div style="display:grid; gap: 10px;">
-                    <div style="display:flex; gap:10px; align-items:center;">
-                        <span style="color:#10B981;">✅</span> <span>Clear standard formatting detected</span>
-                    </div>
-                    <div style="display:flex; gap:10px; align-items:center;">
-                        <span style="color:#10B981;">✅</span> <span>No unreadable graphics found</span>
-                    </div>
-                    <div style="display:flex; gap:10px; align-items:center;">
-                        <span style="color:#EF4444;">⚠️</span> <span>Skills section could be more specific</span>
-                    </div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # SUGGESTIONS ACCORDION
-            with st.expander("Resume Improvement Checklist", expanded=True):
-                if suggestions:
-                    for s in suggestions:
-                        st.warning(s)
-                else:
-                    st.success("✅ Great! Your resume looks good. No major issues found.")
-            
-            # PREDICTED ROLE DISPLAY
-            if predicted_role and predicted_role != "Unknown":
-                if predicted_role != selected_role:
-                    st.info(f"🤖 **AI Analysis:** Your resume content suggests it's best suited for **{predicted_role}** role. Consider tailoring it for {selected_role} if that's your target.")
+# Ensure history session exists
+if "review_history" not in st.session_state:
+    st.session_state.review_history = []
 
+# =====================================================
+#                IF RESULTS EXIST
+# =====================================================
+if results:
+
+    plain_text = results["plain_text"]
+    resume_score = results["score"]
+    suggestions = results["suggestions"]
+    keyword_match = results["keyword_match"]
+    predicted_role = results.get("predicted_role", "Unknown")
+
+    # --- SAVE HISTORY ---
+    try:
+        save_review(
+            role=selected_role,
+            score=int(resume_score),
+            predicted_role=predicted_role,
+            suggestions=suggestions
+        )
+    except Exception as e:
+        print("History Save Failed:", e)
+
+    # ---------------- 📊 COMPARISON SECTION ----------------
+    st.markdown("### 📊 Resume Version Comparison")
+
+    if len(st.session_state.review_history) >= 2:
+        reviews = st.session_state.review_history
+
+        r1 = st.selectbox(
+            "Select Resume 1",
+            reviews,
+            format_func=lambda x: x["time"],
+            key="cmp1"
+        )
+
+        r2 = st.selectbox(
+            "Select Resume 2",
+            reviews,
+            format_func=lambda x: x["time"],
+            key="cmp2"
+        )
+
+        c1, c2 = st.columns(2)
+        c1.metric("Resume 1 Score", r1["score"])
+        c2.metric("Resume 2 Score", r2["score"])
+
+        st.info("Comparison completed — Score difference shown above.")
+
+    else:
+        st.warning("Upload at least 2 resumes to compare.")
+
+
+    # ========= 📈 VISUAL ANALYTICS =========
+    import pandas as pd
+    st.markdown("## 📈 Resume Progress Insights")
+
+    if len(st.session_state.review_history) >= 1:
+        df = pd.DataFrame(st.session_state.review_history)
+        df["index"] = range(1, len(df) + 1)
+
+        st.markdown("### 📉 Resume Score Trend")
+        st.line_chart(df.set_index("index")["score"])
+
+        st.markdown("### 📊 Score Comparison Bar Chart")
+        st.bar_chart(df.set_index("index")["score"])
+
+        st.markdown("### 🧠 Insights Summary")
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Highest Score", max(df["score"]))
+        c2.metric("Lowest Score", min(df["score"]))
+        c3.metric("Total Uploads", len(df))
+
+        if len(df) >= 2:
+            growth = df["score"].iloc[-1] - df["score"].iloc[0]
+            if growth > 0:
+                st.success(f"🚀 Your resume improved by +{growth} points!")
+            elif growth < 0:
+                st.warning(f"⚠️ Your score dropped {growth} points.")
+            else:
+                st.info("ℹ️ No change since first submission.")
+    else:
+        st.info("📄 Upload at least one resume to see analytics.")
+
+    # ========= MAIN 2 COLUMN UI =========
+    d_col1, d_col2 = st.columns([1, 1.2])
+
+    # ================= LEFT PANEL =================
+    with d_col1:
+        with st.expander("⚙️ Tailor Your Analysis", expanded=False):
+            job_description = st.text_area(
+                "Paste Job Description:",
+                height=100,
+                value=st.session_state.get("job_description", ""),
+                key="job_desc_input"
+            )
+
+            exp_levels = ["Entry Level", "Mid Level", "Senior", "Executive"]
+            current_exp = st.session_state.get("experience_level", "Mid Level")
+            default_index = exp_levels.index(current_exp) if current_exp in exp_levels else 1
+
+            experience_level = st.selectbox(
+                "Experience Level:",
+                exp_levels,
+                index=default_index,
+                key="exp_level_input"
+            )
+
+            if st.button("Re-Analyze"):
+                st.session_state.job_description = job_description
+                st.session_state.experience_level = experience_level
+                if "analysis_results" in st.session_state:
+                    del st.session_state.analysis_results
+                st.rerun()
+
+        # Resume Preview
+        st.markdown(f"""
+        <div style="
+            background:white;
+            padding:30px;
+            border-radius:12px;
+            height:800px;
+            overflow-y:auto;
+            border:1px solid #E5E7EB;
+        ">
+            <h3>{st.session_state.get("user", {}).get("name", "Candidate Name")}</h3>
+            <p><strong>Target Role:</strong> {selected_role}</p>
+            <p><strong>AI Predicted Role:</strong> {predicted_role}</p>
+            <hr>
+            <div style="white-space: pre-wrap;">{plain_text[:3000]}...</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+
+    # ================= RIGHT PANEL =================
+    with d_col2:
+        st.subheader("Resume Review")
+
+        # SCORE BADGE
+        st.metric("Resume Score", f"{int(resume_score)}/100")
+
+        # PROGRESS BARS
+        def progress_bar(label, value):
+            st.markdown(f"""
+            <div style="margin-bottom:10px;">
+                <b>{label}:</b> {value}/100
+                <div style="height:8px;background:#eee;border-radius:4px;">
+                    <div style="width:{value}%;height:8px;background:#EC4899;border-radius:4px;"></div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        progress_bar("Content Quality", int(resume_score))
+        progress_bar("Skills Match", int(keyword_match))
+
+        # SUGGESTIONS
+        with st.expander("Resume Improvement Checklist", expanded=True):
+            if suggestions:
+                for s in suggestions[:5]:
+                    st.warning(s)
+            else:
+                st.success("Great! No major issues found 👍")
+
+
+# =====================================================
+#                IF NO RESULTS
+# =====================================================
 else:
     st.info("📄 Please upload a PDF resume to see the analysis.")
-
-if callable(show_footer):
-    show_footer()
