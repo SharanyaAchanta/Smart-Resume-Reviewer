@@ -89,7 +89,14 @@ Smart-Resume-Reviewer/
 
 
 
+## ✨ Contributors
 
+Thanks to all the wonderful contributors 💖
 
+<a href="https://github.com/SharanyaAchanta/Smart-Resume-Reviewer/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=SharanyaAchanta/Smart-Resume-Reviewer" />
+</a>
+
+See full list of contributors 👉 [Contribution Graph](https://github.com/SharanyaAchanta/Smart-Resume-Reviewer/graphs/contributors)
 
 
