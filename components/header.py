@@ -31,6 +31,7 @@ def show_header():
         
         /* Navigation Links Styling */
         .stButton > button {
+            white-space: nowrap !important;
             background: transparent !important;
             border: none !important;
             color: #64748B !important;
@@ -152,6 +153,7 @@ def show_header():
                 ("Home", "Landing"),
                 ("Services", "Services"),
                 ("Blogs", "Blogs"),
+                ("Resume Tips", "Resume Tips"),
                 ("About", "About"),
                 ("Pricing", "Pricing"),
                 ("FAQ", "FAQ")
@@ -172,11 +174,12 @@ def show_header():
                                 border: 1px solid rgba(236, 72, 153, 0.2) !important;
                             }}
                             </style>
+                            
                         """, unsafe_allow_html=True)
                     
                     if st.button(label, key=f"nav_{label.lower()}", use_container_width=True):
                         st.session_state.current_page = page
-                        st.rerun()
+                        st.rerun() 
         
         # --- RIGHT: AUTH & USER INFO ---
         with c3:
