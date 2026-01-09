@@ -269,17 +269,16 @@ This project is licensed under the MIT License - see the [`License`](https://git
 
 <h2 id="stargazers">⭐ Stargazers</h2>
 
-[![Stargazers repo roster for @SharanyaAchanta/Smart-Resume-Reviewer](https://reporoster.com/stars/SharanyaAchanta/Smart-Resume-Reviewer)](https://github.com/SharanyaAchanta/Smart-Resume-Reviewer/stargazers)
-
 <div align="center">
-  <a href="https://github.com/eccentriccoder01/SaralSeva/stargazers">
-    <img src="https://reporoster.com/stars/eccentriccoder01/SaralSeva?type=svg&limit=100&names=false" alt="Stargazers" />
+  <a href="[https://github.com/SharanyaAchanta/Smart-Resume-Reviewer/stargazers](https://github.com/SharanyaAchanta/Smart-Resume-Reviewer/stargazers)">
+    <img 
+      src="https://reporoster.com/stars/SharanyaAchanta/Smart-Resume-Reviewer" 
+      alt="Stargazers"
+    />
   </a>
 </div>
 
 <h2 id="forkers">🍴 Forkers</h2>
-
-[![Forkers repo roster for @SharanyaAchanta/Smart-Resume-Reviewer](https://reporoster.com/forks/SharanyaAchanta/Smart-Resume-Reviewer)](https://github.com/SharanyaAchanta/Smart-Resume-Reviewer/network/members)
 
 <div align="center">
   <a href="[https://github.com/SharanyaAchanta/Smart-Resume-Reviewer/network/members](https://github.com/SharanyaAchanta/Smart-Resume-Reviewer/network/members)">
@@ -287,12 +286,6 @@ This project is licensed under the MIT License - see the [`License`](https://git
       src="https://reporoster.com/forks/SharanyaAchanta/Smart-Resume-Reviewer" 
       alt="Forkers"
     />
-  </a>
-</div>
-
-<div align="center">
-  <a href="https://github.com/eccentriccoder01/SaralSeva/members">
-    <img src="https://reporoster.com/forks/eccentriccoder01/SaralSeva?type=svg&limit=100&names=false" alt="Forkers" />
   </a>
 </div>
 
