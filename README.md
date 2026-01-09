@@ -20,33 +20,24 @@
 - [🔍 Overview](#overview)
 - [🤔 Why Smart-Resume-Reviewer?](#why-smart-resume-reviewer?)
 
-  - [🔐 Privacy & Trust](#citizen-portal)
-  - [⚡ Fast & Distraction-Free](#employee-portal)
-  - [🏆 Proven Results](#admin-portal)
-  - [🎯 Flexible for All Career Paths](#admin-portal)
+  - [🔐 Privacy & Trust](#privacy-&-trust)
+  - [⚡ Fast & Distraction-Free](#fast-&-distraction-free)
+  - [🏆 Proven Results](#proven-results)
+  - [🎯 Flexible for All Career Paths](#flexible-for-all-career-paths)
+
+- [🔍 How This App Is Different?](#how-this-app-is-different?)
 
 - [🚀 Live Demo](#demo)
 - [🌟 Key Features](#key-features)
-  - [👤 Citizen Portal](#citizen-portal)
-  - [🧑‍💼 Employee Portal](#employee-portal)
-  - [🛡️ Admin Portal](#admin-portal)
-- [🛠️ Technologies Used](#technologies-used)
-  - [Frontend](#frontend)
-  - [Backend](#backend)
-  - [DevOps & Automation](#devops--automation)
-- [🤖 Automated Dependency Management](#automated-dependency-management)
-- [🧭 Project Flowchart](#flowchart)
-- [⚙️ Installation and Setup](#installation-setup)
-  - [📋 Prerequisites](#prerequisites)
-  - [Backend Setup](#installation-setup)
-  - [Frontend Setup](#installation-setup)
-- [🛠️ Troubleshooting](#troubleshooting)
-- [✴ Issue Creation](#issue-creation)
-- [📑 Contribution Guidelines](#contribution-guidelines)
-- [📞 Contact](#contact)
-- [🤝 Contributing](#contributing)
-  - [Ways to Contribute](#ways-to-contribute)
-- [📜 Code of Conduct](#code-of-conduct)
+  - [👤 Resume Analysis](#resume-analysis)
+  - [🧑‍💼 AI-Suggestions](#ai-suggestions)
+  - [🛡️ Developer Friendly](#developer-friendly)
+- [🛠️ Tech Stack](#tech-stack)
+- [🧭 Project Structure](#project-structure)
+- [⚙️ Project Setup](#project-setup)
+
+- [🤝 Contributors](#contributors)
+
 - [💡 Suggestions & Feedback](#suggestions-feedback)
 - [🙌 Show Your Support](#show-your-support)
 - [📄 License](#license)
@@ -75,7 +66,7 @@ Built for real-world hiring standards, this project is trusted by students, fres
 
 <h2 id="why-smart-resume-reviewer?">🤔 Why Smart-Resume-Reviewer?</h2>
 
-### 🔐 Privacy & Trust
+<h3 id="privacy-&-trust">🔐 Privacy & Trust</h3>
 
 Smart Resume Reviewer is built with user trust as a top priority.
 
@@ -86,7 +77,7 @@ Smart Resume Reviewer is built with user trust as a top priority.
 
 Your resume stays private, secure, and under your control at all times.
 
-### ⚡ Fast & Distraction-Free
+<h3 id="fast-&-distraction-free">⚡ Fast & Distraction-Free</h3>
 
 This app is designed for users who want results — not distractions.
 
@@ -97,7 +88,7 @@ This app is designed for users who want results — not distractions.
 Users upload a resume and receive analysis within a few seconds.
 The interface is simple, clean, and focused only on resume improvement.
 
-### 🏆 Proven Results
+<h3 id="proven-results">🏆 Proven Results</h3>
 
 Many users of Smart Resume Reviewer have successfully improved their resumes
 and secured opportunities at top tech companies, including FAANG-level organizations.
@@ -105,7 +96,7 @@ and secured opportunities at top tech companies, including FAANG-level organizat
 The tool focuses on real ATS requirements and industry expectations,
 making it practical and result-oriented rather than theoretical.
 
-### 🎯 Flexible for All Career Paths
+<h3 id="flexible-for-all-career-paths">🎯 Flexible for All Career Paths</h3>
 
 Smart Resume Reviewer supports a wide range of roles and disciplines.
 
@@ -117,7 +108,7 @@ Smart Resume Reviewer supports a wide range of roles and disciplines.
 It provides multiple resume templates and suggestions
 tailored to different career paths and experience levels.
 
-## 🔍 How This App Is Different
+<h2 id="how-this-app-is-different?">🔍 How This App Is Different?</h2>
 
 Unlike many resume tools that focus only on scores or visuals,
 Smart Resume Reviewer focuses on clarity, trust, and real-world hiring needs.
@@ -140,26 +131,27 @@ The goal is simple: help users submit better resumes with confidence.
 
 ---
 
-## 🚀 Features
+<h2 id="key-features">🌟 Key Features</h2>
 
-### i) Resume Analysis
-
+<h3 id="resume-analysis">👤 Resume Analysis</h3>
+ 
 - Upload PDF resume
 - Extracts and displays resume content
 
-### ii) AI Suggestions
+<h3 id="ai-suggestions">🧑‍💼 AI Suggestions</h3>
 
 - Highlights weak areas (missing sections, outdated skills)
 - Provides role-based improvement suggestions
 
-### iii) Developer Friendly
+<h3 id="developer-friendly"> 🛡️ Developer Friendly</h3>
 
 - Beginner-friendly codebase
 - Easy to extend and customize
 
 ---
 
-## 🌐 Tech Stack
+<h2 id="#tech-stack"> 🌐 Tech Stack
+</h2>
 
 - **Frontend**: HTML/CSS(For styling purpose)
 - **Backend**: Python (Streamlit)
@@ -168,7 +160,8 @@ The goal is simple: help users submit better resumes with confidence.
 
 ---
 
-## 📁 Project Structure
+<h2 id="#project-structure"> 📁 Project Structure
+</h2>
 
 ```C:.
 Smart-Resume-Reviewer/
@@ -215,7 +208,7 @@ Smart-Resume-Reviewer/
 
 ---
 
-## 🚀 Project Setup
+<h2 id="#project-setup"> ✨ 🚀 Project Setup</h2>
 
 ### 1️⃣ Create Virtual Environment
 
@@ -232,7 +225,7 @@ Smart-Resume-Reviewer/
 
 ---
 
-## ✨ Contributors
+<h2 id="#contributors"> ✨ Contributors</h2>
 
 Thanks to all the wonderful contributors 💖
 
