@@ -6,3 +6,4 @@ pandas
 scikit-learn
 fpdf2
 pdfplumber
+firebase_admin
