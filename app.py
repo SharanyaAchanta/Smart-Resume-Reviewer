@@ -4,6 +4,9 @@ import time
 import fitz
 import hashlib
 import pandas as pd
+import streamlit as st
+from firebase_admin import auth
+
 
 
 # Helper function to generate unique file ID
@@ -138,7 +141,8 @@ from components.suggestions import show_suggestions, get_grammar_suggestions
 from components.contributors import show_contributors_page
 from components.features import show_features_page
 from components import resume_tips
-from components.login import show_login
+from components.login import show_login, show_login_page # Added imports from login.py
+from utils.google_auth import login_with_google # Import Firebase logic
 
 # ✅ CRITICAL: Initialize ALL session state FIRST
 if "theme" not in st.session_state:
@@ -163,6 +167,33 @@ if "job_description" not in st.session_state:
     st.session_state.job_description = ""
 if "experience_level" not in st.session_state:
     st.session_state.experience_level = "Mid Level"
+    
+    
+query_params = st.query_params
+
+if "firebase_token" in query_params:
+    try:
+        decoded = auth.verify_id_token(query_params["firebase_token"])
+
+        st.session_state.logged_in = True
+        st.session_state.user = {
+            "uid": decoded["uid"],
+            "name": decoded.get("name"),
+            "email": decoded.get("email"),
+            "photo": decoded.get("picture"),
+            "auth_provider": "google"
+        }
+
+        st.session_state.auth_mode = False
+        st.session_state.current_page = "Landing"
+
+        # Clean URL
+        st.query_params.clear()
+        st.rerun()
+
+    except Exception as e:
+        st.error("Google login failed. Invalid token.")
+
 
 # Footer import with fallback
 try:
@@ -174,7 +205,6 @@ except Exception:
         def show_footer():
             return None
 
-from components.login import show_login_page  # use your new full-page function
 from components.landing import show_landing_page
 
 # Static Pages
@@ -466,10 +496,16 @@ elif st.session_state.current_page == "Resume Tips":
         show_footer()
     st.stop()
 elif st.session_state.current_page == "Resume Builder":
-    show_resume_builder()
-    if callable(show_footer):
-        show_footer()
-    st.stop()
+    # Ensure user is logged in for Resume Maker
+    if not st.session_state.get("logged_in", False):
+        st.warning("Please login to use the Smart Resume Maker.")
+        st.session_state.auth_mode = True
+        st.rerun()
+    else:
+        show_resume_builder()
+        if callable(show_footer):
+            show_footer()
+        st.stop()
 
 # ✅ ANALYZER PAGE - Continue to show analysis UI
 if st.session_state.current_page != "Analyzer":
