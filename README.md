@@ -252,7 +252,7 @@ Feel free to open issues or discussions if you have any feedback, feature sugges
 
 <h2 id="show-your-support">🙌 Show Your Support</h2>
 
-_If you find SaralSeva project helpful, give it a star! ⭐ to support more such educational initiatives:_
+_If you find Smart-Resume-Reviewer project helpful, give it a star! ⭐ to support more such educational initiatives:_
 
 - ⭐ **Starring the repository**
 - 🐦 **Sharing on social media**
@@ -280,6 +280,15 @@ This project is licensed under the MIT License - see the [`License`](https://git
 <h2 id="forkers">🍴 Forkers</h2>
 
 [![Forkers repo roster for @SharanyaAchanta/Smart-Resume-Reviewer](https://reporoster.com/forks/SharanyaAchanta/Smart-Resume-Reviewer)](https://github.com/SharanyaAchanta/Smart-Resume-Reviewer/network/members)
+
+<div align="center">
+  <a href="[https://github.com/SharanyaAchanta/Smart-Resume-Reviewer/network/members](https://github.com/SharanyaAchanta/Smart-Resume-Reviewer/network/members)">
+    <img 
+      src="https://reporoster.com/forks/SharanyaAchanta/Smart-Resume-Reviewer" 
+      alt="Forkers"
+    />
+  </a>
+</div>
 
 <div align="center">
   <a href="https://github.com/eccentriccoder01/SaralSeva/members">
