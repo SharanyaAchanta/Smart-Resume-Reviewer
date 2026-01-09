@@ -270,9 +270,9 @@ This project is licensed under the MIT License - see the [`License`](https://git
 <h2 id="stargazers">⭐ Stargazers</h2>
 
 <div align="center">
-  <a href="[https://github.com/SharanyaAchanta/Smart-Resume-Reviewer/stargazers](https://github.com/SharanyaAchanta/Smart-Resume-Reviewer/stargazers)">
+  <a href="https://github.com/SharanyaAchanta/Smart-Resume-Reviewer/stargazers">
     <img 
-      src="https://reporoster.com/stars/SharanyaAchanta/Smart-Resume-Reviewer" 
+      src="https://reporoster.com/stars/SharanyaAchanta/Smart-Resume-Reviewer?type=svg&limit=20&names=false" 
       alt="Stargazers"
     />
   </a>
@@ -281,9 +281,9 @@ This project is licensed under the MIT License - see the [`License`](https://git
 <h2 id="forkers">🍴 Forkers</h2>
 
 <div align="center">
-  <a href="[https://github.com/SharanyaAchanta/Smart-Resume-Reviewer/network/members](https://github.com/SharanyaAchanta/Smart-Resume-Reviewer/network/members)">
+  <a href="https://github.com/SharanyaAchanta/Smart-Resume-Reviewer/network/members">
     <img 
-      src="https://reporoster.com/forks/SharanyaAchanta/Smart-Resume-Reviewer" 
+      src="https://reporoster.com/forks/SharanyaAchanta/Smart-Resume-Reviewer?type=svg&limit=20&names=false" 
       alt="Forkers"
     />
   </a>
