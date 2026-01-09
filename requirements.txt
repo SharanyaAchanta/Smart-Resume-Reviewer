@@ -7,3 +7,7 @@ scikit-learn
 fpdf2
 pdfplumber
 firebase_admin
+google-auth-oauthlib
+google-auth
+streamlit
+
