@@ -3,7 +3,7 @@ import re
 import time
 import components.login
 import utils.db as db
-from utils.google_auth import login_with_google  # Ensure this utility exists
+
 
 def is_valid_email(email: str):
     email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
@@ -189,9 +189,6 @@ def show_login_page():
                         st.rerun()
                     else:
                         st.error("❌ Invalid email or password. Please try again.")
-        
-        # --- FIREBASE GOOGLE LOGIN ---
-        login_with_google()
 
         st.markdown(
             "<div class='auth-footer'>Don't have an account? <a href='#'>Sign up</a> to get started.</div>",
@@ -248,9 +245,6 @@ def show_login_page():
                             st.rerun()
                         else:
                             st.error(f"❌ {msg}")
-        
-        # --- FIREBASE GOOGLE LOGIN ---
-        login_with_google()
 
         st.markdown(
             "<div class='auth-footer'>Already have an account? <a href='#'>Sign in</a> instead.</div>",
