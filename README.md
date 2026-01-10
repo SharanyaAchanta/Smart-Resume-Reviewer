@@ -123,9 +123,13 @@ The goal is simple: help users submit better resumes with confidence.
 
  <img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="100%">
 
-<h2 id="demo">🚀 Live Demo</h2>
+<h2 align="center">🚀 Live Demo</h2>
 
-- **[Smart-Resume-Reviewer](https://smart-resume-reviewer-oygjhtx9qnhf4iztnprmcg.streamlit.app/)**
+<p align="center">
+  <a href="https://smart-resume-reviewer-oygjhtx9qnhf4iztnprmcg.streamlit.app/" target="_blank">
+    <img src="https://img.shields.io/badge/🔗%20Open%20Live%20Demo-ff4f9a?style=for-the-badge&logo=google-chrome&logoColor=white" />
+  </a>
+</p>
 
  <img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="100%">
 
