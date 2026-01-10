@@ -1,6 +1,6 @@
 # Contributor Covenant Code of Conduct
 
-![Logo](assets/SRR-logo.png)
+<div align="center"><img src="assets/SRR-logo.png" style="width: 220px; height: 220px;"  alt="Smart-Resume-Review Logo" /></div>
 
 # Code of Conduct
 
