@@ -35,8 +35,8 @@ def show_contributors_page():
 /* Contributors Page Styles */
 
 :root {
-  --primary: #ff6347;
-  --primary-dark: #ff4500;
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
 }
 
 /* Theme-aware color variables */

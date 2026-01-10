@@ -1,127 +1,233 @@
 import streamlit as st
-from pathlib import Path
 import base64
 
-ASSETS_LOGO_PATH = Path("assets/logo_Pixel.png")
-
-def _get_logo_base64(path: Path) -> str:
-    try:
-        return base64.b64encode(path.read_bytes()).decode()
-    except Exception:
-        return ""
-
-def show_sidebar_navbar(active_page="Analyzer"):
-    logo_b64 = _get_logo_base64(ASSETS_LOGO_PATH)
-    img_tag = f'<img src="data:image/png;base64,{logo_b64}" width="40" style="border-radius:8px; vertical-align:middle;" />' if logo_b64 else ''
-    
-    current_theme = st.session_state.get('theme', 'Dark')
-    
-    with st.sidebar:
-        # === LOGIN SECTION (TOP) ===
-        if "show_login_modal" not in st.session_state:
-            st.session_state.show_login_modal = False
-        if "logged_in" not in st.session_state:
-            st.session_state.logged_in = False
-        
-        if not st.session_state.logged_in:
-            if st.button("🔐 Login", use_container_width=True):
-                st.session_state.show_login_modal = True
-                st.rerun()
-            st.markdown("---")
-        else:
-            st.success("✅ Logged In")
-            if st.button("🚪 Logout", use_container_width=True):
-                for key in list(st.session_state.keys()):
-                    del st.session_state[key]
-                st.rerun()
-            st.markdown("---")
-        
-        # === LOGO & BRAND ===
-        st.markdown(f"""
-        <style>
-        .sidebar-header {{
-            padding: 1.5rem 1rem 1rem !important;
-            background: linear-gradient(135deg, rgba(14,17,23,0.95) 0%, rgba(27,31,36,0.95) 100%) !important;
-            border-radius: 16px !important;
-            margin-bottom: 1.5rem !important;
-            text-align: center !important;
-            backdrop-filter: blur(20px) !important;
-        }}
-        .sidebar-title {{
-            font-size: 24px !important;
-            font-weight: 900 !important;
-            background: linear-gradient(135deg, #00d4aa, #00b140) !important;
-            -webkit-background-clip: text !important;
-            -webkit-text-fill-color: transparent !important;
-            margin: 0 0 0.5rem 0 !important;
-        }}
-        .sidebar-subtitle {{
-            color: rgba(255,255,255,0.8) !important;
-            font-size: 14px !important;
-            margin: 0 !important;
-            line-height: 1.4 !important;
-        }}
-        </style>
-        <div class="sidebar-header">
-            {img_tag}
-            <h1 class="sidebar-title">Smart Resume Analyzer</h1>
-            <p class="sidebar-subtitle">Upload your resume (PDF) and get instant feedback!</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # === NAVIGATION LINKS ===
-        if st.button("🏠 Home", key="nav_home", use_container_width=True):
-            st.session_state.current_page = "Analyzer"
-            st.session_state.show_contributors = False
-            st.session_state.show_features = False
-            st.rerun()
-            
-        if st.button("📄 Analyzer", key="nav_analyzer", use_container_width=True):
-            st.session_state.current_page = "Analyzer"
-            st.session_state.show_contributors = False
-            st.session_state.show_features = False
-            st.rerun()
-            
-        if st.button("✨ Features", key="nav_features", use_container_width=True):
-            st.session_state.show_features = True
-            st.session_state.show_contributors = False
-            st.session_state.current_page = "Features"
-            st.rerun()
-            
-        if st.button("📝 Tips", key="nav_tips", use_container_width=True):
-            st.session_state.current_page = "Resume Tips"
-            st.session_state.show_features = False
-            st.session_state.show_contributors = False
-            st.rerun()
-            
-        if st.button("👥 Contributors", key="nav_contributors", use_container_width=True):
-            st.session_state.show_contributors = True
-            st.session_state.show_features = False
-            st.session_state.current_page = "Contributors"
-            st.rerun()
-            
-        # === THEME TOGGLE ===
-        st.markdown("---")
-        if st.button(f"{'☀️ Light' if current_theme == 'Dark' else '🌙 Dark'} Mode", 
-                    key="theme_toggle_main", use_container_width=True):
-            st.session_state.theme = "Light" if st.session_state.theme == "Dark" else "Dark"
-            st.rerun()
-
 def show_header():
-    """SIMPLE TITLE ONLY in main content area"""
+    """Professional header/navbar with modern design."""
+    current = st.session_state.get("current_page", "Landing")
+    is_logged_in = st.session_state.get("logged_in", False)
+    user_name = st.session_state.get("user", {}).get("name", "") if is_logged_in else ""
+    
+    # Professional header CSS with Outfit font
     st.markdown("""
-    <style>
-    .simple-title {
-        font-size: clamp(2.5rem, 6vw, 4rem) !important;
-        font-weight: 900 !important;
-        background: linear-gradient(135deg, #00d4aa 0%, #00b140 100%) !important;
-        -webkit-background-clip: text !important;
-        -webkit-text-fill-color: transparent !important;
-        text-align: center !important;
-        margin: 2rem 0 1rem 0 !important;
-        padding: 1rem !important;
-    }
-    </style>
-    <h1 class="simple-title">Smart Resume Analyzer 🧠📄</h1>
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+        
+        .header-container {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            padding: 18px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s ease;
+        }
+        
+        .header-container:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Navigation Links Styling */
+        .stButton > button {
+            white-space: nowrap !important;
+            background: transparent !important;
+            border: none !important;
+            color: #64748B !important;
+            font-weight: 500 !important;
+            font-size: 15px !important;
+            font-family: 'Outfit', sans-serif !important;
+            padding: 10px 18px !important;
+            border-radius: 10px !important;
+            cursor: pointer !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            box-shadow: none !important;
+        }
+        
+        .stButton > button:hover {
+            background: rgba(236, 72, 153, 0.08) !important;
+            color: #EC4899 !important;
+            transform: translateY(-1px);
+        }
+        
+        /* Hide hidden logo button */
+        button[key="logo_btn_hidden"] {
+            display: none !important;
+        }
+        
+        /* Auth Buttons - PINK */
+        .stButton > button[type="primary"] {
+            background: linear-gradient(135deg, #EC4899 0%, #DB2777 100%) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 12px !important;
+            padding: 10px 22px !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
+            font-family: 'Outfit', sans-serif !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3) !important;
+        }
+        
+        .stButton > button[type="primary"]:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(236, 72, 153, 0.4) !important;
+            filter: brightness(1.05);
+        }
+        
+        .stButton > button[type="secondary"] {
+            background: white !important;
+            color: #EC4899 !important;
+            border: 2px solid #EC4899 !important;
+            border-radius: 12px !important;
+            padding: 8px 20px !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
+            font-family: 'Outfit', sans-serif !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .stButton > button[type="secondary"]:hover {
+            background: rgba(236, 72, 153, 0.05) !important;
+            transform: translateY(-1px);
+        }
+        
+        /* User Greeting - PINK */
+        .user-greeting {
+            color: #1E293B;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            padding: 8px 16px;
+            background: rgba(236, 72, 153, 0.05);
+            border-radius: 10px;
+            display: inline-block;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .header-container {
+                padding: 12px 0;
+            }
+        }
+        </style>
     """, unsafe_allow_html=True)
-   
+    
+    with st.container():
+        st.markdown("<div class='header-container'>", unsafe_allow_html=True)
+        c1, c2, c3 = st.columns([1.8, 4.2, 2])
+        
+        # --- LEFT: LOGO ---
+        with c1:
+            if st.button("📄 RESULYZE", key="logo_btn", use_container_width=False):
+                st.session_state.current_page = "Landing"
+                st.rerun()
+            # Style the logo button - PINK
+            st.markdown("""
+                <style>
+                button[key="logo_btn"] {
+                    background: transparent !important;
+                    border: none !important;
+                    font-size: 26px !important;
+                    font-weight: 800 !important;
+                    font-family: 'Outfit', sans-serif !important;
+                    padding: 0 !important;
+                    color: transparent !important;
+                    background-image: linear-gradient(135deg, #EC4899 0%, #DB2777 100%) !important;
+                    -webkit-background-clip: text !important;
+                    background-clip: text !important;
+                    box-shadow: none !important;
+                    transition: all 0.3s ease !important;
+                }
+                button[key="logo_btn"]:hover {
+                    transform: scale(1.05) !important;
+                    filter: brightness(1.1) !important;
+                }
+                </style>
+            """, unsafe_allow_html=True)
+        
+        # --- CENTER: NAVIGATION LINKS ---
+        with c2:
+            nav_items = [
+                ("Home", "Landing"),
+                ("Services", "Services"),
+                ("Blogs", "Blogs"),
+                ("Resume Tips", "Resume Tips"),
+                ("About", "About"),
+                ("Pricing", "Pricing"),
+                ("FAQ", "FAQ")
+            ]
+            
+            cols = st.columns(len(nav_items))
+            for idx, (label, page) in enumerate(nav_items):
+                with cols[idx]:
+                    is_active = current == page
+                    # Style buttons based on active state - PINK
+                    if is_active:
+                        st.markdown(f"""
+                            <style>
+                            button[key="nav_{label.lower()}"] {{
+                                background: linear-gradient(135deg, rgba(236, 72, 153, 0.1) 0%, rgba(219, 39, 119, 0.1) 100%) !important;
+                                color: #EC4899 !important;
+                                font-weight: 600 !important;
+                                border: 1px solid rgba(236, 72, 153, 0.2) !important;
+                            }}
+                            </style>
+                            
+                        """, unsafe_allow_html=True)
+                    
+                    if st.button(label, key=f"nav_{label.lower()}", use_container_width=True):
+                        st.session_state.current_page = page
+                        st.rerun() 
+        
+        # --- RIGHT: AUTH & USER INFO ---
+        with c3:
+            if is_logged_in:
+                col_user, col_logout = st.columns([2.2, 1])
+                with col_user:
+                    st.markdown(f"""
+                        <div class="user-greeting">
+                            👋 Hi, {user_name.split()[0] if user_name else 'User'}
+                        </div>
+                    """, unsafe_allow_html=True)
+                with col_logout:
+                    if st.button("Logout", key="nav_logout", use_container_width=True, type="secondary"):
+                        st.session_state.logged_in = False
+                        st.session_state.user = None
+                        st.session_state.auth_mode = False
+                        st.session_state.current_page = "Landing"
+                        st.rerun()
+            else:
+                col_login, col_signup = st.columns([1, 1])
+                with col_login:
+                    if st.button("Login", key="nav_login", use_container_width=True, type="primary"):
+                        st.session_state.auth_mode = True
+                        st.rerun()
+                with col_signup:
+                    if st.button("Sign Up", key="nav_signup", use_container_width=True, type="secondary"):
+                        st.session_state.auth_mode = True
+                        st.session_state.auth_tab = "signup"
+                        st.rerun()
+        
+        st.markdown("</div>", unsafe_allow_html=True)
+    
+    # Elegant gradient separator - PINK
+    st.markdown("""
+        <div style='
+            height: 3px; 
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(236, 72, 153, 0.3) 20%, 
+                rgba(219, 39, 119, 0.5) 50%, 
+                rgba(236, 72, 153, 0.3) 80%, 
+                transparent 100%
+            ); 
+            margin: 0 0 10px 0;
+            border-radius: 2px;
+        '></div>
+    """, unsafe_allow_html=True)
+    
+def show_sidebar_navbar(active_page):
+    # We use top navbar instead of sidebar
+    pass

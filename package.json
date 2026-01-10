@@ -1,0 +1,22 @@
+{
+  "name": "smart-resume-reviewer",
+  "version": "1.0.0",
+  "description": "An AI-powered resume analyzer and improvement assistant.\r # Check out the app now\r https://smart-resume-reviewer-oygjhtx9qnhf4iztnprmcg.streamlit.app/\r # Smart Resume Reviewer 🧠📄",
+  "main": "index.js",
+  
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SharanyaAchanta/Smart-Resume-Reviewer.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SharanyaAchanta/Smart-Resume-Reviewer/issues"
+  },
+  "homepage": "https://github.com/SharanyaAchanta/Smart-Resume-Reviewer#readme"
+}
