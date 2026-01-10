@@ -1,4 +1,3 @@
-
 import streamlit as st
 import json
 import time
@@ -8,17 +7,11 @@ if "theme" not in st.session_state:
     st.session_state.theme = "Dark"
 theme = st.session_state.theme
 
-
-if theme == "Dark":
-    dark_css = """
-        <style>
-        body { background-color: #0e1117; color: white; }
-        .stApp { background-color: #0e1117; }
-        </style>
-    """
-    st.markdown(dark_css, unsafe_allow_html=True)
-
-st.set_page_config(page_title="Smart Resume Analyzer", layout="wide")
+st.set_page_config(
+    page_title="Smart Resume Analyzer",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
 # --- LOADING SCREEN WITH ANIMATION ---
 if "page_loaded" not in st.session_state:
@@ -156,92 +149,62 @@ if st.session_state.current_page == "Resume Tips":
 
 # Apply CSS overrides based on theme - DARK MODE FIRST
 if st.session_state.theme == "Dark":
-    st.markdown(
-        """
-        <style>
-        body, .stApp {
-            background-color: #0e1117 !important;
-            color: #e8f1f2 !important;
-        }
-        .card {
-            background: #1b1f24 !important;
-            color: #e8f1f2 !important;
-        }
-        [data-testid="stFileUploader"] {
-            border: 2px solid rgba(80, 200, 120, 0.35) !important;
-            background: linear-gradient(145deg, #131416, #1a1c1f) !important;
-            padding: 30px !important;
-            border-radius: 14px !important;
-            transition: all 0.35s ease-in-out !important;
-            cursor: pointer !important;
-            margin: auto;
-        }
-        [data-testid="stFileUploader"] * {
-            color: #e8f1f2 !important;
-        }
-        [data-testid="stFileUploader"] svg {
-            fill: #2ecc71 !important;
-            width: 36px !important;
-            height: 36px !important;
-        }
-        [data-testid="stFileUploader"]:hover {
-            border-color: #2ecc71 !important;
-            box-shadow: 0px 0px 18px rgba(46, 204, 113, 0.25);
-            transform: translateY(-2px);
-        }
-        [data-testid="stFileUploader"].drag-over {
-            border-color: #1abc9c !important;
-            box-shadow: 0px 0px 25px rgba(26, 188, 156, 0.35);
-            background: #1c1f21 !important;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-else:
-    st.markdown(
-        """
-        <style>
-        body, .stApp {
-            background-color: #fafbfc !important;
-            color: #1a202c !important;
-        }
-        .card {
-            background: #f7fafc !important;
-            color: #1a202c !important;
-            border: 1px solid #e2e8f0 !important;
-        }
-        [data-testid="stFileUploader"] {
-            border: 2px solid rgba(59, 130, 246, 0.3) !important;
-            background: linear-gradient(145deg, #f8fafc, #edf2f7) !important;
-            padding: 30px !important;
-            border-radius: 14px !important;
-            transition: all 0.35s ease-in-out !important;
-            cursor: pointer !important;
-            margin: auto;
-        }
-        [data-testid="stFileUploader"] * {
-            color: #2d3748 !important;
-        }
-        [data-testid="stFileUploader"] svg {
-            fill: #4299e1 !important;
-            width: 36px !important;
-            height: 36px !important;
-        }
-        [data-testid="stFileUploader"]:hover {
-            border-color: #3182ce !important;
-            box-shadow: 0px 0px 18px rgba(59, 130, 246, 0.25);
-            transform: translateY(-2px);
-        }
-        [data-testid="stFileUploader"].drag-over {
-            border-color: #2b6cb0 !important;
-            box-shadow: 0px 0px 25px rgba(59, 130, 246, 0.35);
-            background: #e6f3ff !important;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
+    st.markdown("""
+    <style>
+    /* GLOBAL BACKGROUND */
+    body, .stApp {
+        background-color: #0D1117 !important;
+        color: #F0F6FC !important;
+    }
+
+    /* CARDS / SECTIONS */
+    .card,
+    [data-testid="stExpander"],
+    .stTextArea,
+    .stSelectbox,
+    .stFileUploader {
+        background-color: #161B22 !important;
+        color: #F0F6FC !important;
+        border-radius: 14px !important;
+        border: 1px solid #30363D !important;
+    }
+
+    /* LABELS & TEXT */
+    label, .stMarkdown p, h1, h2, h3, h4, h5 {
+        color: #E6EDF3 !important;
+        font-weight: 500;
+    }
+
+    /* INPUTS */
+    input, textarea, select {
+        background-color: #1F2933 !important;
+        color: #F0F6FC !important;
+        border: 1px solid #30363D !important;
+        border-radius: 8px !important;
+    }
+
+    input::placeholder, textarea::placeholder {
+        color: #8B949E !important;
+    }
+
+    /* BUTTONS */
+    .stButton > button {
+        background: linear-gradient(135deg, #7C7CFF, #5A5AFF) !important;
+        color: white !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        padding: 10px 22px !important;
+    }
+
+    /* ALERTS */
+    .stInfo, .stSuccess, .stWarning {
+        background-color: #161B22 !important;
+        color: #F0F6FC !important;
+        border-left: 4px solid #7C7CFF !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
 
 # [Rest of your existing code continues unchanged from here...]
 # --- PERSISTENT PRIVACY BANNER ---
