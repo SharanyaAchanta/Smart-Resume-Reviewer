@@ -104,10 +104,10 @@ def show_resume_builder():
             data=st.session_state.get("resume_pdf_bytes"),
             file_name=st.session_state.get("resume_pdf_filename", "Resume.pdf"),
             mime="application/pdf",
-            use_container_width=True,
+            width="stretch",
             type="primary"
         )
-        if st.button("Generate New Resume", use_container_width=True):
+        if st.button("Generate New Resume", width="stretch"):
             st.session_state.resume_generated = False
             st.session_state.resume_pdf_bytes = None
             st.session_state.resume_pdf_filename = None

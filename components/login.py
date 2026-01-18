@@ -148,10 +148,10 @@ def show_login_page():
     # ---- TABS (LOGIN / SIGNUP) ----
     col_login, col_signup = st.columns(2)
     with col_login:
-        if st.button("Login", key="auth_tab_login", use_container_width=True):
+        if st.button("Login", key="auth_tab_login", width="stretch"):
             switch_tab("login")
     with col_signup:
-        if st.button("Sign Up", key="auth_tab_signup", use_container_width=True):
+        if st.button("Sign Up", key="auth_tab_signup", width="stretch"):
             switch_tab("signup")
 
     st.markdown("<div style='height: 24px'></div>", unsafe_allow_html=True)
@@ -168,7 +168,7 @@ def show_login_page():
             </div>
         """, unsafe_allow_html=True)
 
-        if st.button("Sign In", key="login_submit_page", use_container_width=True, type="primary"):
+        if st.button("Sign In", key="login_submit_page", width="stretch", type="primary"):
             if not email or not password:
                 st.error("⚠️ Please fill in all fields.")
             else:
@@ -214,7 +214,7 @@ def show_login_page():
             if feedback:
                 st.caption(f"Add: {', '.join(feedback)}")
 
-        if st.button("Create Account", key="signup_submit_page", use_container_width=True, type="primary"):
+        if st.button("Create Account", key="signup_submit_page", width="stretch", type="primary"):
             if not all([name, email, password, confirm]):
                 st.error("⚠️ Please fill in all fields.")
             elif password != confirm:

@@ -161,7 +161,7 @@ def show_landing_page():
         # CTA Buttons
         col_cta1, col_cta2 = st.columns([1, 1.5])
         with col_cta1:
-            if st.button("🚀 Analyze Resume", key="land_analyze", use_container_width=True, type="primary"):
+            if st.button("🚀 Analyze Resume", key="land_analyze", width="stretch", type="primary"):
                 if st.session_state.get("logged_in", False):
                     st.session_state.current_page = "Analyzer"
                     st.rerun()
@@ -170,7 +170,7 @@ def show_landing_page():
                     st.session_state.auth_tab = "login"
                     st.rerun()
         with col_cta2:
-            if st.button("✨ Build Resume", key="land_build", use_container_width=True, type="secondary"):
+            if st.button("✨ Build Resume", key="land_build", width="stretch", type="secondary"):
                 if st.session_state.get("logged_in", False):
                     st.session_state.current_page = "Resume Builder"
                     st.rerun()
@@ -181,7 +181,7 @@ def show_landing_page():
 
     with hero_col2:
         try:
-            st.image("assets/hero_image.png", use_container_width=True)
+            st.image("assets/hero_image.png", width="stretch")
         except:
             # Fallback if image doesn't exist
             st.markdown("""
