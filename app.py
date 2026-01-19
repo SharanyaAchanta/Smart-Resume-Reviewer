@@ -386,11 +386,11 @@ if st.session_state.consent is None:
         # Action Buttons in standard columns (High Visibility)
         cb1, cb2 = st.columns([1, 5])
         with cb1:
-            if st.button("Accept", key="cookie_accept_top", type="primary", use_container_width=True):
+            if st.button("Accept", key="cookie_accept_top", type="primary", width="stretch"):
                 st.session_state.consent = "all"
                 st.rerun()
         with cb2:
-            if st.button("Later", key="cookie_later_top", use_container_width=False):
+            if st.button("Later", key="cookie_later_top", width="content"):
                 st.session_state.consent = "later"
                 st.rerun()
                 
@@ -729,8 +729,93 @@ if results:
                     st.warning(s)
             else:
                 st.success("Great! No major issues found 👍")
+        
+        # Detailed explanations for checklist items (LLM-powered)
+        with st.expander("Why these improvements matter", expanded=False):
+            import os
+            from langchain_google_genai import ChatGoogleGenerativeAI
+            from langchain_core.prompts import ChatPromptTemplate
+            os.environ["GOOGLE_API_KEY"] = "AIzaSyBKDjVXMdT4VcHAKGJz5yWLJnNwa9FIYfM"
+            if "improvement_explanations" not in st.session_state:
+                st.session_state.improvement_explanations = None
 
+            model = ChatGoogleGenerativeAI(model = "gemini-2.5-flash-lite", temperature = 0)
 
+            prompt_template = ChatPromptTemplate.from_messages([
+                ("system", "you are a helpful assistant that explains resume improvement suggestions clearly and like a teacher to a student , explain every suggestion seperately") ,
+                ("human" , "{suggestions}")
+            ])
+            generate = st.button("Generate Explanation")
+
+            if generate and st.session_state.improvement_explanations is None:
+                with st.spinner("🔄 Generating detailed explanations..."):
+
+                    # ⏱ small delay to avoid rate-limit spikes
+                    time.sleep(2)
+
+                    joined = "\n".join(f"- {s}" for s in suggestions)
+                    prompt = prompt_template.invoke({"suggestions": joined})
+
+                    response = model.invoke(prompt)
+                    st.session_state.improvement_explanations = response.content
+
+            explanation_text = st.session_state.improvement_explanations
+
+            if explanation_text:
+                # Enhanced styling
+                st.markdown("""
+                <style>
+                .explanation-container {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    border-radius: 12px;
+                    padding: 20px;
+                    margin: 15px 0;
+                    color: white;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                }
+                .explanation-content {
+                    background: rgba(255, 255, 255, 0.1);
+                    border-left: 4px solid #ffd700;
+                    padding: 15px;
+                    border-radius: 8px;
+                    line-height: 1.6;
+                    font-size: 14px;
+                }
+                </style>
+                """, unsafe_allow_html=True)
+
+                # Header
+                col1, col2 = st.columns([0.1, 0.9])
+                with col1:
+                    st.markdown("💡")
+                with col2:
+                    st.markdown("### Why These Improvements Matter")
+
+                # Content
+                st.markdown("""
+                <div class="explanation-container">
+                    <div class="explanation-content">
+                """, unsafe_allow_html=True)
+
+                st.markdown(explanation_text)
+
+                st.markdown("""
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+
+                # Footer
+                st.markdown("""
+                <div style="margin-top: 15px; padding: 10px; background-color: #f0f2f6;
+                border-radius: 8px; text-align: center; font-size: 12px; color: #666;">
+                💬 <b>Pro Tip:</b> Implementing these improvements will significantly
+                enhance your resume's effectiveness and increase your chances of landing interviews.
+                </div>
+                """, unsafe_allow_html=True)
+
+            else:
+                st.info("Click **Generate Explanation** to get detailed insights.")
+            
 # =====================================================
 #                IF NO RESULTS
 # =====================================================

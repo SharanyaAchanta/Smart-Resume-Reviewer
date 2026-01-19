@@ -120,7 +120,7 @@ def show_header():
         
         # --- LEFT: LOGO ---
         with c1:
-            if st.button("📄 RESULYZE", key="logo_btn", use_container_width=False):
+            if st.button("📄 RESULYZE", key="logo_btn", width="content"):
                 st.session_state.current_page = "Landing"
                 st.rerun()
             # Style the logo button - PINK
@@ -177,7 +177,7 @@ def show_header():
                             
                         """, unsafe_allow_html=True)
                     
-                    if st.button(label, key=f"nav_{label.lower()}", use_container_width=True):
+                    if st.button(label, key=f"nav_{label.lower()}", width="stretch"):
                         st.session_state.current_page = page
                         st.rerun() 
         
@@ -192,7 +192,7 @@ def show_header():
                         </div>
                     """, unsafe_allow_html=True)
                 with col_logout:
-                    if st.button("Logout", key="nav_logout", use_container_width=True, type="secondary"):
+                    if st.button("Logout", key="nav_logout", width="stretch", type="secondary"):
                         st.session_state.logged_in = False
                         st.session_state.user = None
                         st.session_state.auth_mode = False
@@ -201,11 +201,11 @@ def show_header():
             else:
                 col_login, col_signup = st.columns([1, 1])
                 with col_login:
-                    if st.button("Login", key="nav_login", use_container_width=True, type="primary"):
+                    if st.button("Login", key="nav_login", width="stretch", type="primary"):
                         st.session_state.auth_mode = True
                         st.rerun()
                 with col_signup:
-                    if st.button("Sign Up", key="nav_signup", use_container_width=True, type="secondary"):
+                    if st.button("Sign Up", key="nav_signup", width="stretch", type="secondary"):
                         st.session_state.auth_mode = True
                         st.session_state.auth_tab = "signup"
                         st.rerun()

@@ -10,4 +10,5 @@ firebase_admin
 google-auth-oauthlib
 google-auth
 streamlit
-
+langchain_core
+langchain-huggingface

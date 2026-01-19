@@ -59,7 +59,7 @@ def show_history_ui():
             if st.sidebar.button(
                 label,
                 key=f"history_btn_{idx}",
-                use_container_width=True
+                width="stretch"
             ):
                 st.session_state.selected_review = review
 
