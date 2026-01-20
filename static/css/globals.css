@@ -4,14 +4,20 @@
   --card-border: #e5e7eb;
   --text-main: #111827;
   --text-muted: #6b7280;
-  --accent: #2563eb;       /* Professional Blue */
+  --accent: #2563eb;
   --accent-hover: #1d4ed8;
   --success: #059669;
   --warning: #d97706;
+  --danger: #dc2626;
   --radius: 8px;
   --ff-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+  --surface-muted: #f3f4f6;
+  --surface-success: #ecfdf5;
+  --surface-warning: #fffbeb;
+  --surface-danger: #fef2f2;
 }
 
 * {
@@ -20,7 +26,7 @@
 
 body {
   font-family: var(--ff-sans) !important;
-  background: #f9fafb !important; /* Slight off-white background for app */
+  background: #f9fafb !important;
   color: var(--text-main) !important;
 }
 
@@ -32,6 +38,12 @@ body {
   padding: 24px;
   box-shadow: var(--shadow-sm);
   margin-bottom: 16px;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.streamlit-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }
 
 /* --- Buttons --- */
@@ -55,6 +67,12 @@ button.stButton:hover {
   transform: translateY(-1px);
 }
 
+a.stButton > button:focus-visible,
+button.stButton:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3) !important;
+}
+
 /* --- Inputs --- */
 .stTextInput > div > interrupt,
 .stTextInput > div > input,
@@ -66,6 +84,7 @@ button.stButton:hover {
   padding: 10px 12px !important;
   font-size: 14px !important;
   box-shadow: var(--shadow-sm) !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .stTextInput > div > input:focus,
@@ -101,7 +120,75 @@ p, li, span, label {
   border: 1px solid #e5e7eb !important;
 }
 
+/* --- Alerts --- */
+.ui-alert {
+  padding: 12px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  border: 1px solid transparent;
+}
+
+.ui-alert.success {
+  background: var(--surface-success);
+  border-color: #a7f3d0;
+  color: #065f46;
+}
+
+.ui-alert.warning {
+  background: var(--surface-warning);
+  border-color: #fde68a;
+  color: #92400e;
+}
+
+.ui-alert.danger {
+  background: var(--surface-danger);
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+/* --- Badges --- */
+.ui-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 12px;
+  border-radius: 999px;
+  background: var(--surface-muted);
+  color: #374151;
+  font-weight: 500;
+}
+
+.ui-badge.success { background: #ecfdf5; color: #065f46; }
+.ui-badge.warning { background: #fffbeb; color: #92400e; }
+.ui-badge.danger { background: #fef2f2; color: #991b1b; }
+
+/* --- Skeleton loader --- */
+.ui-skeleton {
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 37%, #f3f4f6 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: 6px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+/* --- Utilities --- */
+.ui-muted {
+  background: var(--surface-muted);
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.ui-divider {
+  height: 1px;
+  width: 100%;
+  background: #e5e7eb;
+  margin: 16px 0;
+}
+
 /* --- Footer --- */
 footer {
-    visibility: hidden;
+  visibility: hidden;
 }
