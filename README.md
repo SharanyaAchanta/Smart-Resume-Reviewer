@@ -60,7 +60,7 @@ It analyzes resumes to identify:
 - Outdated or irrelevant skills
 - Formatting issues that reduce ATS shortlisting chances
 
-Users can upload their resume and receive instant, actionable AI-driven suggestions to improve content, structure, and overall resume quality — without distractions or delays.
+Users can upload their resume and receive instant, actionable AI-driven suggestions to improve content, detailed and simple explanation for improved content, structure, and overall resume quality — without distractions or delays.
 
 Built for real-world hiring standards, this project is trusted by students, freshers, and professionals preparing for competitive job applications across industries.
 
@@ -146,6 +146,7 @@ The goal is simple: help users submit better resumes with confidence.
 
 - Highlights weak areas (missing sections, outdated skills)
 - Provides role-based improvement suggestions
+- explanation for the improvement suggestions
 
 <h3 id="developer-friendly"> 🛡️ Developer Friendly</h3>
 
@@ -158,7 +159,7 @@ The goal is simple: help users submit better resumes with confidence.
 </h2>
 
 - **Frontend**: HTML/CSS(For styling purpose)
-- **Backend**: Python (Streamlit)
+- **Backend**: Python (Streamlit,langchain,Google generative Ai)
 - **AI Logic**: Rule-based or prompt-based suggestions
 - **PDF Parsing**: PyMuPDF / pdfminer.six
 
