@@ -735,7 +735,7 @@ if results:
             import os
             from langchain_google_genai import ChatGoogleGenerativeAI
             from langchain_core.prompts import ChatPromptTemplate
-            os.environ["GOOGLE_API_KEY"] = "GOOGLE_API_KEY" # add your api key here 
+            os.environ["GOOGLE_API_KEY"] = "GOOGLE_API_KEY" # add your api key here
             if "improvement_explanations" not in st.session_state:
                 st.session_state.improvement_explanations = None
 

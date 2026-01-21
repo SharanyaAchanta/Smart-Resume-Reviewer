@@ -159,7 +159,7 @@ The goal is simple: help users submit better resumes with confidence.
 </h2>
 
 - **Frontend**: HTML/CSS(For styling purpose)
-- **Backend**: Python (Streamlit,langchain,Google generative Ai)
+- **Backend**: Python (Streamlit,langchain,Google generative AI)
 - **AI Logic**: Rule-based or prompt-based suggestions
 - **PDF Parsing**: PyMuPDF / pdfminer.six
 
