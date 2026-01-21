@@ -730,12 +730,12 @@ if results:
             else:
                 st.success("Great! No major issues found 👍")
         
-        # Detailed explanations for checklist items (LLM-powered)
+        # detailed description for improvement skills (LLM-powered)
         with st.expander("Why these improvements matter", expanded=False):
             import os
             from langchain_google_genai import ChatGoogleGenerativeAI
             from langchain_core.prompts import ChatPromptTemplate
-            os.environ["GOOGLE_API_KEY"] = "AIzaSyBKDjVXMdT4VcHAKGJz5yWLJnNwa9FIYfM"
+            os.environ["GOOGLE_API_KEY"] = "GOOGLE_API_KEY" # add your api key here
             if "improvement_explanations" not in st.session_state:
                 st.session_state.improvement_explanations = None
 
@@ -750,7 +750,7 @@ if results:
             if generate and st.session_state.improvement_explanations is None:
                 with st.spinner("🔄 Generating detailed explanations..."):
 
-                    # ⏱ small delay to avoid rate-limit spikes
+                    # small delay to avoid rate-limit spikes
                     time.sleep(2)
 
                     joined = "\n".join(f"- {s}" for s in suggestions)
@@ -762,7 +762,6 @@ if results:
             explanation_text = st.session_state.improvement_explanations
 
             if explanation_text:
-                # Enhanced styling
                 st.markdown("""
                 <style>
                 .explanation-container {

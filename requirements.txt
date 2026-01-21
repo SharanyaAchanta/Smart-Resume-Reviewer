@@ -11,4 +11,4 @@ google-auth-oauthlib
 google-auth
 streamlit
 langchain_core
-langchain-huggingface
+langchain_google_genai
