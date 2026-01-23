@@ -13,6 +13,7 @@ The Batch Upload feature allows users to upload and analyze multiple resumes (2-
 ## Features Implemented
 
 ### 1. **Batch Upload Component** (`components/batch_upload.py`)
+
 - Multi-file uploader with validation
 - Support for 2-10 files per batch
 - File type validation (PDF, DOCX, TXT)
@@ -21,6 +22,7 @@ The Batch Upload feature allows users to upload and analyze multiple resumes (2-
 - File list preview with size information
 
 ### 2. **Batch Analyzer** (`utils/batch_analyzer.py`)
+
 - Parallel processing of multiple resumes
 - Progress tracking with callbacks
 - Individual resume analysis using existing parser
@@ -29,6 +31,7 @@ The Batch Upload feature allows users to upload and analyze multiple resumes (2-
 - Error handling for failed analyses
 
 ### 3. **Comparison View** (`components/comparison_view.py`)
+
 - **Summary Dashboard**: Total files, success/fail counts, average scores
 - **Comparison Table**: Sortable table with color-coded scores
 - **Visual Charts**: Bar charts for score and keyword match distribution
@@ -40,6 +43,7 @@ The Batch Upload feature allows users to upload and analyze multiple resumes (2-
   - Resume preview
 
 ### 4. **Export Functionality** (`utils/export_handler.py`)
+
 - **CSV Export**: Spreadsheet-friendly format with all analysis data
 - **PDF Export**: Professional report with:
   - Summary statistics
@@ -48,6 +52,7 @@ The Batch Upload feature allows users to upload and analyze multiple resumes (2-
   - Failed analyses section (if any)
 
 ### 5. **UI Integration** (`app.py`)
+
 - Toggle switch between Single and Batch modes
 - Mode-specific information messages
 - Progress bar during batch analysis
@@ -110,12 +115,12 @@ Smart-Resume-Reviewer/
 
 ### Validation Rules
 
-| Rule | Limit | Error Message |
-|------|-------|---------------|
-| Minimum files | 2 files | "Please upload at least 2 files for batch processing" |
-| Maximum files | 10 files | "Maximum 10 files allowed. You uploaded X files" |
-| File size | 5MB per file | "Size (X MB) exceeds 5 MB limit" |
-| File types | PDF, DOCX, TXT | "Invalid type '.ext'. Allowed: PDF, DOCX, TXT" |
+| Rule          | Limit          | Error Message                                         |
+| ------------- | -------------- | ----------------------------------------------------- |
+| Minimum files | 2 files        | "Please upload at least 2 files for batch processing" |
+| Maximum files | 10 files       | "Maximum 10 files allowed. You uploaded X files"      |
+| File size     | 5MB per file   | "Size (X MB) exceeds 5 MB limit"                      |
+| File types    | PDF, DOCX, TXT | "Invalid type '.ext'. Allowed: PDF, DOCX, TXT"        |
 
 ### Batch Analysis Process
 
@@ -132,12 +137,14 @@ Smart-Resume-Reviewer/
 ### Export Formats
 
 **CSV Format:**
+
 ```csv
 Filename,Score,Keyword Match (%),Predicted Role,Word Count,Issues Found,Suggestions,Analysis Date
 resume1.pdf,75,80,Software Engineer,500,3,"Add projects | Include skills | ...",2026-01-24 10:30:45
 ```
 
 **PDF Format:**
+
 - Title page with generation timestamp
 - Summary statistics section
 - Detailed results per resume
@@ -169,6 +176,7 @@ python3 test_batch_upload.py
 ```
 
 **Expected Output:**
+
 ```
 ============================================================
 BATCH UPLOAD FEATURE TEST SUITE
@@ -298,6 +306,7 @@ app.py
 ### Version 1.0.0 (Initial Release)
 
 **Added:**
+
 - Batch upload component with multi-file support
 - Batch analyzer with progress tracking
 - Comparison view with sortable table and charts
@@ -307,10 +316,12 @@ app.py
 - Complete documentation
 
 **Modified:**
+
 - `app.py`: Added batch mode toggle and conditional rendering
 - Session state initialization for batch-related variables
 
 **Files Created:**
+
 - `components/batch_upload.py`
 - `utils/batch_analyzer.py`
 - `components/comparison_view.py`
@@ -329,15 +340,6 @@ When modifying the batch upload feature:
 3. **Update Documentation**: Keep this file synchronized with code changes
 4. **Follow Patterns**: Use existing code patterns from single mode
 5. **Handle Errors**: Always include try-except blocks for file operations
-
----
-
-## Credits
-
-**Implemented by:** Claude Code
-**Issue:** #140
-**Related Issues:** #134 (File Validation), #136 (MIME Validation)
-**Date:** January 2026
 
 ---
 
