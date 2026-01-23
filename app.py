@@ -527,12 +527,21 @@ else:
         "Upload Resume (PDF)", type="pdf", help="Upload a PDF resume to analyze"
     )
 
+# --- RESUME PREVIEW ---
+if uploaded_file:
+    from components.resume_preview import show_resume_preview
+
+    # Show preview of uploaded resume
+    st.markdown("---")
+    show_resume_preview(uploaded_file, show_full_preview=False)
+    st.markdown("---")
+
 # --- ANALYSIS DASHBOARD ---
 if uploaded_file:
     current_file_id = _file_id(uploaded_file)
     if st.session_state.last_file_id != current_file_id:
         st.session_state.last_file_id = current_file_id
-        
+
         with st.spinner("⏳ Analysis in progress..."):
             time.sleep(1) # Simulated delay for effect
 
