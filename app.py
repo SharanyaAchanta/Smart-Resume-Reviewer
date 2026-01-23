@@ -484,6 +484,20 @@ show_history_ui()
 
 st.markdown("<h1 style='background: linear-gradient(135deg, #EC4899 0%, #DB2777 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; margin-bottom: 20px;'>📊 Resume Analyzer</h1>", unsafe_allow_html=True)
 
+# --- BATCH MODE TOGGLE ---
+if "batch_mode" not in st.session_state:
+    st.session_state.batch_mode = False
+
+col_toggle1, col_toggle2 = st.columns([1, 4])
+with col_toggle1:
+    batch_mode = st.toggle("📦 Batch Mode", value=st.session_state.batch_mode, key="batch_mode_toggle")
+    st.session_state.batch_mode = batch_mode
+with col_toggle2:
+    if batch_mode:
+        st.info("Batch mode: Upload 2-10 resumes for bulk analysis and comparison")
+    else:
+        st.info("Single mode: Upload one resume for detailed analysis")
+
 # --- LOAD JOB ROLES ---
 try:
     with open("utils/job_roles.json", "r") as f:
@@ -516,307 +530,398 @@ st.info(
     "No personal data is saved or logged."
 )
 
-# --- HANDLE FILE FROM LANDING PAGE ---
-if "uploaded_file_temp" in st.session_state and st.session_state.uploaded_file_temp:
-    uploaded_file = st.session_state.uploaded_file_temp
-    # Keep it persistent? Or clear it? 
-    # For now, let's just use it.
-else:
-    # Fallback uploader on Analyzer page
-    uploaded_file = st.file_uploader(
-        "Upload Resume (PDF)", type="pdf", help="Upload a PDF resume to analyze"
-    )
+# ============================================
+# BATCH MODE VS SINGLE MODE
+# ============================================
 
-# --- ANALYSIS DASHBOARD ---
-if uploaded_file:
-    current_file_id = _file_id(uploaded_file)
-    if st.session_state.last_file_id != current_file_id:
-        st.session_state.last_file_id = current_file_id
-        
-        with st.spinner("⏳ Analysis in progress..."):
-            time.sleep(1) # Simulated delay for effect
+if st.session_state.batch_mode:
+    # --- BATCH MODE ---
+    from components.batch_upload import batch_upload_card
+    from utils.batch_analyzer import batch_analyze_resumes, get_batch_summary
+    from components.comparison_view import show_comparison_view
+    from utils.export_handler import export_to_csv, export_to_pdf, get_export_filename
 
-        # PARSE
-        parsed = parse_resume(uploaded_file)
-        plain_text = parsed.get("plain_text", "")
-        
-        # Get job description and experience level from session state
-        job_description = st.session_state.get("job_description", "")
-        experience_level = st.session_state.get("experience_level", "Mid Level")
-        
-        # ANALYZE
-        suggestions, resume_score, keyword_match, predicted_role = get_resume_feedback(
-            plain_text, 
-            selected_role, 
-            job_description=job_description, 
-            experience_level=experience_level
-        )
-        
-        # Save results to session state to prevent re-running on interaction
-        st.session_state.analysis_results = {
-            "plain_text": plain_text,
-            "suggestions": suggestions,
-            "score": resume_score,
-            "keyword_match": keyword_match,
-            "predicted_role": predicted_role
-        }
+    uploaded_files = batch_upload_card()
 
-# --- DASHBOARD UI ---
-results = st.session_state.get("analysis_results", None)
+    if uploaded_files and len(uploaded_files) >= 2:
+        if st.button("🚀 Analyze All Resumes", type="primary", use_container_width=True):
+            with st.spinner("⏳ Analyzing resumes... This may take a moment."):
+                # Progress bar
+                progress_bar = st.progress(0)
+                progress_text = st.empty()
 
-# Ensure history session exists
-if "review_history" not in st.session_state:
-    st.session_state.review_history = []
+                def update_progress(current, total):
+                    progress = current / total
+                    progress_bar.progress(progress)
+                    progress_text.text(f"Processing {current}/{total} resumes...")
 
-# =====================================================
-#                IF RESULTS EXIST
-# =====================================================
-if results:
+                # Analyze all resumes
+                results = batch_analyze_resumes(
+                    uploaded_files,
+                    selected_role,
+                    job_description=st.session_state.get("job_description", ""),
+                    experience_level=st.session_state.get("experience_level", "Mid Level"),
+                    progress_callback=update_progress
+                )
 
-    plain_text = results["plain_text"]
-    resume_score = results["score"]
-    suggestions = results["suggestions"]
-    keyword_match = results["keyword_match"]
-    predicted_role = results.get("predicted_role", "Unknown")
+                # Clear progress indicators
+                progress_bar.empty()
+                progress_text.empty()
 
-    # --- SAVE HISTORY ---
-    try:
-        save_review(
-            role=selected_role,
-            score=int(resume_score),
-            predicted_role=predicted_role,
-            suggestions=suggestions
-        )
-    except Exception as e:
-        print("History Save Failed:", e)
+                # Get summary
+                summary = get_batch_summary(results)
 
-    # ---------------- 📊 COMPARISON SECTION ----------------
-    st.markdown("### 📊 Resume Version Comparison")
+                # Store in session state
+                st.session_state.batch_results = results
+                st.session_state.batch_summary = summary
 
-    if len(st.session_state.review_history) >= 2:
-        reviews = st.session_state.review_history
-
-        r1 = st.selectbox(
-            "Select Resume 1",
-            reviews,
-            format_func=lambda x: x["time"],
-            key="cmp1"
-        )
-
-        r2 = st.selectbox(
-            "Select Resume 2",
-            reviews,
-            format_func=lambda x: x["time"],
-            key="cmp2"
-        )
-
-        c1, c2 = st.columns(2)
-        c1.metric("Resume 1 Score", r1["score"])
-        c2.metric("Resume 2 Score", r2["score"])
-
-        st.info("Comparison completed — Score difference shown above.")
-
-    else:
-        st.warning("Upload at least 2 resumes to compare.")
-
-
-    # ========= 📈 VISUAL ANALYTICS =========
-    import pandas as pd
-    st.markdown("## 📈 Resume Progress Insights")
-
-    if len(st.session_state.review_history) >= 1:
-        df = pd.DataFrame(st.session_state.review_history)
-        df["index"] = range(1, len(df) + 1)
-
-        st.markdown("### 📉 Resume Score Trend")
-        st.line_chart(df.set_index("index")["score"])
-
-        st.markdown("### 📊 Score Comparison Bar Chart")
-        st.bar_chart(df.set_index("index")["score"])
-
-        st.markdown("### 🧠 Insights Summary")
-        c1, c2, c3 = st.columns(3)
-        c1.metric("Highest Score", max(df["score"]))
-        c2.metric("Lowest Score", min(df["score"]))
-        c3.metric("Total Uploads", len(df))
-
-        if len(df) >= 2:
-            growth = df["score"].iloc[-1] - df["score"].iloc[0]
-            if growth > 0:
-                st.success(f"🚀 Your resume improved by +{growth} points!")
-            elif growth < 0:
-                st.warning(f"⚠️ Your score dropped {growth} points.")
-            else:
-                st.info("ℹ️ No change since first submission.")
-    else:
-        st.info("📄 Upload at least one resume to see analytics.")
-
-    # ========= MAIN 2 COLUMN UI =========
-    d_col1, d_col2 = st.columns([1, 1.2])
-
-    # ================= LEFT PANEL =================
-    with d_col1:
-        with st.expander("⚙️ Tailor Your Analysis", expanded=False):
-            job_description = st.text_area(
-                "Paste Job Description:",
-                height=100,
-                value=st.session_state.get("job_description", ""),
-                key="job_desc_input"
-            )
-
-            exp_levels = ["Entry Level", "Mid Level", "Senior", "Executive"]
-            current_exp = st.session_state.get("experience_level", "Mid Level")
-            default_index = exp_levels.index(current_exp) if current_exp in exp_levels else 1
-
-            experience_level = st.selectbox(
-                "Experience Level:",
-                exp_levels,
-                index=default_index,
-                key="exp_level_input"
-            )
-
-            if st.button("Re-Analyze"):
-                st.session_state.job_description = job_description
-                st.session_state.experience_level = experience_level
-                if "analysis_results" in st.session_state:
-                    del st.session_state.analysis_results
+                st.success("✅ Batch analysis completed!")
                 st.rerun()
 
-        # Resume Preview
-        st.markdown(f"""
-        <div style="
-            background:white;
-            padding:30px;
-            border-radius:12px;
-            height:800px;
-            overflow-y:auto;
-            border:1px solid #E5E7EB;
-        ">
-            <h3>{st.session_state.get("user", {}).get("name", "Candidate Name")}</h3>
-            <p><strong>Target Role:</strong> {selected_role}</p>
-            <p><strong>AI Predicted Role:</strong> {predicted_role}</p>
-            <hr>
-            <div style="white-space: pre-wrap;">{plain_text[:3000]}...</div>
-        </div>
-        """, unsafe_allow_html=True)
+        # Display results if available
+        if "batch_results" in st.session_state and st.session_state.batch_results:
+            st.markdown("---")
+
+            # Export buttons
+            col_exp1, col_exp2 = st.columns(2)
+            with col_exp1:
+                csv_data = export_to_csv(st.session_state.batch_results)
+                if csv_data:
+                    st.download_button(
+                        label="📥 Download CSV Report",
+                        data=csv_data,
+                        file_name=get_export_filename("csv"),
+                        mime="text/csv",
+                        use_container_width=True
+                    )
+
+            with col_exp2:
+                pdf_data = export_to_pdf(
+                    st.session_state.batch_results,
+                    st.session_state.batch_summary,
+                    selected_role
+                )
+                if pdf_data:
+                    st.download_button(
+                        label="📥 Download PDF Report",
+                        data=pdf_data,
+                        file_name=get_export_filename("pdf"),
+                        mime="application/pdf",
+                        use_container_width=True
+                    )
+
+            st.markdown("---")
+
+            # Show comparison view
+            show_comparison_view(
+                st.session_state.batch_results,
+                st.session_state.batch_summary
+            )
+
+else:
+    # --- SINGLE MODE (EXISTING LOGIC) ---
+    # --- HANDLE FILE FROM LANDING PAGE ---
+    if "uploaded_file_temp" in st.session_state and st.session_state.uploaded_file_temp:
+        uploaded_file = st.session_state.uploaded_file_temp
+        # Keep it persistent? Or clear it?
+        # For now, let's just use it.
+    else:
+        # Fallback uploader on Analyzer page
+        uploaded_file = st.file_uploader(
+            "Upload Resume (PDF)", type="pdf", help="Upload a PDF resume to analyze"
+        )
+
+    # --- ANALYSIS DASHBOARD ---
+    if uploaded_file:
+        current_file_id = _file_id(uploaded_file)
+        if st.session_state.last_file_id != current_file_id:
+            st.session_state.last_file_id = current_file_id
+
+            with st.spinner("⏳ Analysis in progress..."):
+                time.sleep(1) # Simulated delay for effect
+
+            # PARSE
+            parsed = parse_resume(uploaded_file)
+            plain_text = parsed.get("plain_text", "")
+
+            # Get job description and experience level from session state
+            job_description = st.session_state.get("job_description", "")
+            experience_level = st.session_state.get("experience_level", "Mid Level")
+
+            # ANALYZE
+            suggestions, resume_score, keyword_match, predicted_role = get_resume_feedback(
+                plain_text,
+                selected_role,
+                job_description=job_description,
+                experience_level=experience_level
+            )
+
+            # Save results to session state to prevent re-running on interaction
+            st.session_state.analysis_results = {
+                "plain_text": plain_text,
+                "suggestions": suggestions,
+                "score": resume_score,
+                "keyword_match": keyword_match,
+                "predicted_role": predicted_role
+            }
+
+    # --- DASHBOARD UI ---
+    results = st.session_state.get("analysis_results", None)
+
+    # Ensure history session exists
+    if "review_history" not in st.session_state:
+        st.session_state.review_history = []
+
+    # =====================================================
+    #                IF RESULTS EXIST
+    # =====================================================
+    if results:
+
+        plain_text = results["plain_text"]
+        resume_score = results["score"]
+        suggestions = results["suggestions"]
+        keyword_match = results["keyword_match"]
+        predicted_role = results.get("predicted_role", "Unknown")
+
+        # --- SAVE HISTORY ---
+        try:
+            save_review(
+                role=selected_role,
+                score=int(resume_score),
+                predicted_role=predicted_role,
+                suggestions=suggestions
+            )
+        except Exception as e:
+            print("History Save Failed:", e)
+
+        # ---------------- 📊 COMPARISON SECTION ----------------
+        st.markdown("### 📊 Resume Version Comparison")
+
+        if len(st.session_state.review_history) >= 2:
+            reviews = st.session_state.review_history
+
+            r1 = st.selectbox(
+                "Select Resume 1",
+                reviews,
+                format_func=lambda x: x["time"],
+                key="cmp1"
+            )
+
+            r2 = st.selectbox(
+                "Select Resume 2",
+                reviews,
+                format_func=lambda x: x["time"],
+                key="cmp2"
+            )
+
+            c1, c2 = st.columns(2)
+            c1.metric("Resume 1 Score", r1["score"])
+            c2.metric("Resume 2 Score", r2["score"])
+
+            st.info("Comparison completed — Score difference shown above.")
+
+        else:
+            st.warning("Upload at least 2 resumes to compare.")
 
 
-    # ================= RIGHT PANEL =================
-    with d_col2:
-        st.subheader("Resume Review")
+        # ========= 📈 VISUAL ANALYTICS =========
+        import pandas as pd
+        st.markdown("## 📈 Resume Progress Insights")
 
-        # SCORE BADGE
-        st.metric("Resume Score", f"{int(resume_score)}/100")
+        if len(st.session_state.review_history) >= 1:
+            df = pd.DataFrame(st.session_state.review_history)
+            df["index"] = range(1, len(df) + 1)
 
-        # PROGRESS BARS
-        def progress_bar(label, value):
+            st.markdown("### 📉 Resume Score Trend")
+            st.line_chart(df.set_index("index")["score"])
+
+            st.markdown("### 📊 Score Comparison Bar Chart")
+            st.bar_chart(df.set_index("index")["score"])
+
+            st.markdown("### 🧠 Insights Summary")
+            c1, c2, c3 = st.columns(3)
+            c1.metric("Highest Score", max(df["score"]))
+            c2.metric("Lowest Score", min(df["score"]))
+            c3.metric("Total Uploads", len(df))
+
+            if len(df) >= 2:
+                growth = df["score"].iloc[-1] - df["score"].iloc[0]
+                if growth > 0:
+                    st.success(f"🚀 Your resume improved by +{growth} points!")
+                elif growth < 0:
+                    st.warning(f"⚠️ Your score dropped {growth} points.")
+                else:
+                    st.info("ℹ️ No change since first submission.")
+        else:
+            st.info("📄 Upload at least one resume to see analytics.")
+
+        # ========= MAIN 2 COLUMN UI =========
+        d_col1, d_col2 = st.columns([1, 1.2])
+
+        # ================= LEFT PANEL =================
+        with d_col1:
+            with st.expander("⚙️ Tailor Your Analysis", expanded=False):
+                job_description = st.text_area(
+                    "Paste Job Description:",
+                    height=100,
+                    value=st.session_state.get("job_description", ""),
+                    key="job_desc_input"
+                )
+
+                exp_levels = ["Entry Level", "Mid Level", "Senior", "Executive"]
+                current_exp = st.session_state.get("experience_level", "Mid Level")
+                default_index = exp_levels.index(current_exp) if current_exp in exp_levels else 1
+
+                experience_level = st.selectbox(
+                    "Experience Level:",
+                    exp_levels,
+                    index=default_index,
+                    key="exp_level_input"
+                )
+
+                if st.button("Re-Analyze"):
+                    st.session_state.job_description = job_description
+                    st.session_state.experience_level = experience_level
+                    if "analysis_results" in st.session_state:
+                        del st.session_state.analysis_results
+                    st.rerun()
+
+            # Resume Preview
             st.markdown(f"""
-            <div style="margin-bottom:10px;">
-                <b>{label}:</b> {value}/100
-                <div style="height:8px;background:#eee;border-radius:4px;">
-                    <div style="width:{value}%;height:8px;background:#EC4899;border-radius:4px;"></div>
-                </div>
+            <div style="
+                background:white;
+                padding:30px;
+                border-radius:12px;
+                height:800px;
+                overflow-y:auto;
+                border:1px solid #E5E7EB;
+            ">
+                <h3>{st.session_state.get("user", {}).get("name", "Candidate Name")}</h3>
+                <p><strong>Target Role:</strong> {selected_role}</p>
+                <p><strong>AI Predicted Role:</strong> {predicted_role}</p>
+                <hr>
+                <div style="white-space: pre-wrap;">{plain_text[:3000]}...</div>
             </div>
             """, unsafe_allow_html=True)
 
-        progress_bar("Content Quality", int(resume_score))
-        progress_bar("Skills Match", int(keyword_match))
 
-        # SUGGESTIONS
-        with st.expander("Resume Improvement Checklist", expanded=True):
-            if suggestions:
-                for s in suggestions[:5]:
-                    st.warning(s)
-            else:
-                st.success("Great! No major issues found 👍")
-        
-        # detailed description for improvement skills (LLM-powered)
-        with st.expander("Why these improvements matter", expanded=False):
-            import os
-            from langchain_google_genai import ChatGoogleGenerativeAI
-            from langchain_core.prompts import ChatPromptTemplate
-            os.environ["GOOGLE_API_KEY"] = "GOOGLE_API_KEY" # add your api key here
-            if "improvement_explanations" not in st.session_state:
-                st.session_state.improvement_explanations = None
+        # ================= RIGHT PANEL =================
+        with d_col2:
+            st.subheader("Resume Review")
 
-            model = ChatGoogleGenerativeAI(model = "gemini-2.5-flash-lite", temperature = 0)
+            # SCORE BADGE
+            st.metric("Resume Score", f"{int(resume_score)}/100")
 
-            prompt_template = ChatPromptTemplate.from_messages([
-                ("system", "you are a helpful assistant that explains resume improvement suggestions clearly and like a teacher to a student , explain every suggestion seperately") ,
-                ("human" , "{suggestions}")
-            ])
-            generate = st.button("Generate Explanation")
-
-            if generate and st.session_state.improvement_explanations is None:
-                with st.spinner("🔄 Generating detailed explanations..."):
-
-                    # small delay to avoid rate-limit spikes
-                    time.sleep(2)
-
-                    joined = "\n".join(f"- {s}" for s in suggestions)
-                    prompt = prompt_template.invoke({"suggestions": joined})
-
-                    response = model.invoke(prompt)
-                    st.session_state.improvement_explanations = response.content
-
-            explanation_text = st.session_state.improvement_explanations
-
-            if explanation_text:
-                st.markdown("""
-                <style>
-                .explanation-container {
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    border-radius: 12px;
-                    padding: 20px;
-                    margin: 15px 0;
-                    color: white;
-                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                }
-                .explanation-content {
-                    background: rgba(255, 255, 255, 0.1);
-                    border-left: 4px solid #ffd700;
-                    padding: 15px;
-                    border-radius: 8px;
-                    line-height: 1.6;
-                    font-size: 14px;
-                }
-                </style>
-                """, unsafe_allow_html=True)
-
-                # Header
-                col1, col2 = st.columns([0.1, 0.9])
-                with col1:
-                    st.markdown("💡")
-                with col2:
-                    st.markdown("### Why These Improvements Matter")
-
-                # Content
-                st.markdown("""
-                <div class="explanation-container">
-                    <div class="explanation-content">
-                """, unsafe_allow_html=True)
-
-                st.markdown(explanation_text)
-
-                st.markdown("""
+            # PROGRESS BARS
+            def progress_bar(label, value):
+                st.markdown(f"""
+                <div style="margin-bottom:10px;">
+                    <b>{label}:</b> {value}/100
+                    <div style="height:8px;background:#eee;border-radius:4px;">
+                        <div style="width:{value}%;height:8px;background:#EC4899;border-radius:4px;"></div>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
 
-                # Footer
-                st.markdown("""
-                <div style="margin-top: 15px; padding: 10px; background-color: #f0f2f6;
-                border-radius: 8px; text-align: center; font-size: 12px; color: #666;">
-                💬 <b>Pro Tip:</b> Implementing these improvements will significantly
-                enhance your resume's effectiveness and increase your chances of landing interviews.
-                </div>
-                """, unsafe_allow_html=True)
+            progress_bar("Content Quality", int(resume_score))
+            progress_bar("Skills Match", int(keyword_match))
 
-            else:
-                st.info("Click **Generate Explanation** to get detailed insights.")
-            
-# =====================================================
-#                IF NO RESULTS
-# =====================================================
-else:
-    st.info("📄 Please upload a PDF resume to see the analysis.")
+            # SUGGESTIONS
+            with st.expander("Resume Improvement Checklist", expanded=True):
+                if suggestions:
+                    for s in suggestions[:5]:
+                        st.warning(s)
+                else:
+                    st.success("Great! No major issues found 👍")
+
+            # detailed description for improvement skills (LLM-powered)
+            with st.expander("Why these improvements matter", expanded=False):
+                import os
+                from langchain_google_genai import ChatGoogleGenerativeAI
+                from langchain_core.prompts import ChatPromptTemplate
+                os.environ["GOOGLE_API_KEY"] = "GOOGLE_API_KEY" # add your api key here
+                if "improvement_explanations" not in st.session_state:
+                    st.session_state.improvement_explanations = None
+
+                model = ChatGoogleGenerativeAI(model = "gemini-2.5-flash-lite", temperature = 0)
+
+                prompt_template = ChatPromptTemplate.from_messages([
+                    ("system", "you are a helpful assistant that explains resume improvement suggestions clearly and like a teacher to a student , explain every suggestion seperately") ,
+                    ("human" , "{suggestions}")
+                ])
+                generate = st.button("Generate Explanation")
+
+                if generate and st.session_state.improvement_explanations is None:
+                    with st.spinner("🔄 Generating detailed explanations..."):
+
+                        # small delay to avoid rate-limit spikes
+                        time.sleep(2)
+
+                        joined = "\n".join(f"- {s}" for s in suggestions)
+                        prompt = prompt_template.invoke({"suggestions": joined})
+
+                        response = model.invoke(prompt)
+                        st.session_state.improvement_explanations = response.content
+
+                explanation_text = st.session_state.improvement_explanations
+
+                if explanation_text:
+                    st.markdown("""
+                    <style>
+                    .explanation-container {
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        border-radius: 12px;
+                        padding: 20px;
+                        margin: 15px;
+0;
+                        color: white;
+                        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                    }
+                    .explanation-content {
+                        background: rgba(255, 255, 255, 0.1);
+                        border-left: 4px solid #ffd700;
+                        padding: 15px;
+                        border-radius: 8px;
+                        line-height: 1.6;
+                        font-size: 14px;
+                    }
+                    </style>
+                    """, unsafe_allow_html=True)
+
+                    # Header
+                    col1, col2 = st.columns([0.1, 0.9])
+                    with col1:
+                        st.markdown("💡")
+                    with col2:
+                        st.markdown("### Why These Improvements Matter")
+
+                    # Content
+                    st.markdown("""
+                    <div class="explanation-container">
+                        <div class="explanation-content">
+                    """, unsafe_allow_html=True)
+
+                    st.markdown(explanation_text)
+
+                    st.markdown("""
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                    # Footer
+                    st.markdown("""
+                    <div style="margin-top: 15px; padding: 10px; background-color: #f0f2f6;
+                    border-radius: 8px; text-align: center; font-size: 12px; color: #666;">
+                    💬 <b>Pro Tip:</b> Implementing these improvements will significantly
+                    enhance your resume's effectiveness and increase your chances of landing interviews.
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                else:
+                    st.info("Click **Generate Explanation** to get detailed insights.")
+
+    # =====================================================
+    #                IF NO RESULTS
+    # =====================================================
+    else:
+        st.info("📄 Please upload a PDF resume to see the analysis.")
