@@ -12,3 +12,4 @@ google-auth
 streamlit
 langchain_core
 langchain_google_genai
+python-magic

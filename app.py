@@ -515,7 +515,7 @@ if isinstance(job_roles, dict) and selected_category in job_roles:
     roles = list(job_roles[selected_category].keys())
     selected_role = st.selectbox("Select Specific Role:", roles, key="role_select")
     role_info = job_roles[selected_category][selected_role]
-    with st.expander(f"📌 {selected_role} - Required Skills & Info", expanded=True):
+    with st.expander(f" {selected_role} - Required Skills & Info", expanded=True):
         c1, c2 = st.columns(2)
         with c1:
             st.info(role_info.get("description", "No description available"))
@@ -577,6 +577,126 @@ if st.session_state.batch_mode:
 
                 st.success("✅ Batch analysis completed!")
                 st.rerun()
+# --- HANDLE FILE FROM LANDING PAGE ---
+if "uploaded_file_temp" in st.session_state and st.session_state.uploaded_file_temp:
+    uploaded_file = st.session_state.uploaded_file_temp
+    # Keep it persistent? Or clear it?
+    # For now, let's just use it.
+else:
+    # Fallback uploader on Analyzer page with validation
+    from components.upload_card import validate_uploaded_file, ALLOWED_FILE_TYPES, MAX_FILE_SIZE_MB
+
+    uploaded_file_temp = st.file_uploader(
+        "Upload Resume (PDF, DOCX, TXT)",
+        type=ALLOWED_FILE_TYPES,
+        help=f"Upload a resume file (max {MAX_FILE_SIZE_MB} MB) to analyze"
+    )
+
+# --- RESUME PREVIEW ---
+if uploaded_file:
+    from components.resume_preview import show_resume_preview
+
+    # Show preview of uploaded resume
+    st.markdown("---")
+    show_resume_preview(uploaded_file, show_full_preview=False)
+    st.markdown("---")
+    # Validate the uploaded file (including MIME type check)
+    if uploaded_file_temp:
+        is_valid, error_message = validate_uploaded_file(uploaded_file_temp)
+        if not is_valid:
+            st.error(error_message)
+            uploaded_file = None
+        else:
+            uploaded_file = uploaded_file_temp
+    else:
+        uploaded_file = None
+
+# --- ANALYSIS DASHBOARD ---
+if uploaded_file:
+    current_file_id = _file_id(uploaded_file)
+    if st.session_state.last_file_id != current_file_id:
+        st.session_state.last_file_id = current_file_id
+
+        with st.spinner("⏳ Analysis in progress..."):
+            time.sleep(1) # Simulated delay for effect
+
+        # PARSE
+        parsed = parse_resume(uploaded_file)
+        plain_text = parsed.get("plain_text", "")
+        
+        # Get job description and experience level from session state
+        job_description = st.session_state.get("job_description", "")
+        experience_level = st.session_state.get("experience_level", "Mid Level")
+        
+        # ANALYZE
+        suggestions, resume_score, keyword_match, predicted_role = get_resume_feedback(
+            plain_text, 
+            selected_role, 
+            job_description=job_description, 
+            experience_level=experience_level
+        )
+        
+        # Save results to session state to prevent re-running on interaction
+        st.session_state.analysis_results = {
+            "plain_text": plain_text,
+            "suggestions": suggestions,
+            "score": resume_score,
+            "keyword_match": keyword_match,
+            "predicted_role": predicted_role
+        }
+
+# --- DASHBOARD UI ---
+results = st.session_state.get("analysis_results", None)
+
+# Ensure history session exists
+if "review_history" not in st.session_state:
+    st.session_state.review_history = []
+
+# =====================================================
+#                IF RESULTS EXIST
+# =====================================================
+if results:
+
+    plain_text = results["plain_text"]
+    resume_score = results["score"]
+    suggestions = results["suggestions"]
+    keyword_match = results["keyword_match"]
+    predicted_role = results.get("predicted_role", "Unknown")
+
+    # --- SAVE HISTORY ---
+    try:
+        save_review(
+            role=selected_role,
+            score=int(resume_score),
+            predicted_role=predicted_role,
+            suggestions=suggestions
+        )
+    except Exception as e:
+        print("History Save Failed:", e)
+
+    # ----------------  COMPARISON SECTION ----------------
+    st.markdown("###  Resume Version Comparison")
+
+    if len(st.session_state.review_history) >= 2:
+        reviews = st.session_state.review_history
+
+        r1 = st.selectbox(
+            "Select Resume 1",
+            reviews,
+            format_func=lambda x: x["time"],
+            key="cmp1"
+        )
+
+        r2 = st.selectbox(
+            "Select Resume 2",
+            reviews,
+            format_func=lambda x: x["time"],
+            key="cmp2"
+        )
+
+        c1, c2 = st.columns(2)
+        c1.metric("Resume 1 Score", r1["score"])
+        c2.metric("Resume 2 Score", r2["score"])
 
         # Display results if available
         if "batch_results" in st.session_state and st.session_state.batch_results:
