@@ -519,12 +519,16 @@ st.info(
 # --- HANDLE FILE FROM LANDING PAGE ---
 if "uploaded_file_temp" in st.session_state and st.session_state.uploaded_file_temp:
     uploaded_file = st.session_state.uploaded_file_temp
-    # Keep it persistent? Or clear it? 
+    # Keep it persistent? Or clear it?
     # For now, let's just use it.
 else:
-    # Fallback uploader on Analyzer page
-    uploaded_file = st.file_uploader(
-        "Upload Resume (PDF)", type="pdf", help="Upload a PDF resume to analyze"
+    # Fallback uploader on Analyzer page with validation
+    from components.upload_card import validate_uploaded_file, ALLOWED_FILE_TYPES, MAX_FILE_SIZE_MB
+
+    uploaded_file_temp = st.file_uploader(
+        "Upload Resume (PDF, DOCX, TXT)",
+        type=ALLOWED_FILE_TYPES,
+        help=f"Upload a resume file (max {MAX_FILE_SIZE_MB} MB) to analyze"
     )
 
 # --- RESUME PREVIEW ---
