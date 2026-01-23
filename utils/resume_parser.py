@@ -360,6 +360,7 @@ def _parse_experience_block(lines: List[str]) -> List[dict]:
 def parse_resume(file_obj) -> dict:
     """
     Accepts a file-like object (e.g. Streamlit uploaded_file).
+    Supports PDF, DOCX, and TXT files.
     Returns:
       {
         "plain_text": "...",   # cleaned
@@ -371,31 +372,51 @@ def parse_resume(file_obj) -> dict:
     file_obj.seek(0)
     file_bytes = file_obj.read()
 
-    # 1) try PyMuPDF block extraction
-    try:
-        blocks = _extract_blocks_with_pymupdf(file_bytes)
-        plain = _blocks_to_plain(blocks)
-    except Exception:
-        blocks = []
-        plain = ""
+    # Check if file is TXT by trying to decode as UTF-8 and checking file extension
+    file_name = getattr(file_obj, 'name', '').lower()
+    is_txt_file = file_name.endswith('.txt')
 
-    # 2) if plain too short, fallback to pdfplumber text extraction
-    if (not plain or len(plain.strip()) < 80) and pdfplumber is not None:
-        try:
-            plumber_text = _extract_text_pdfplumber(file_bytes)
-            if len(plumber_text.strip()) > len(plain):
-                plain = plumber_text
-        except Exception:
-            pass
+    plain = ""
 
-    # 3) OCR fallback
-    if (not plain or len(plain.strip()) < 200) and OCR_AVAILABLE:
+    # Handle TXT files directly
+    if is_txt_file:
         try:
-            ocr_text = _ocr_pdf_bytes(file_bytes)
-            if len(ocr_text.strip()) > len(plain):
-                plain = ocr_text
+            # Try to decode as UTF-8 text
+            plain = file_bytes.decode('utf-8', errors='ignore')
         except Exception:
-            pass
+            # Fallback to latin-1 encoding
+            try:
+                plain = file_bytes.decode('latin-1', errors='ignore')
+            except Exception:
+                plain = ""
+
+    # Handle PDF/DOCX files with existing extraction methods
+    if not plain:
+        # 1) try PyMuPDF block extraction
+        try:
+            blocks = _extract_blocks_with_pymupdf(file_bytes)
+            plain = _blocks_to_plain(blocks)
+        except Exception:
+            blocks = []
+            plain = ""
+
+        # 2) if plain too short, fallback to pdfplumber text extraction
+        if (not plain or len(plain.strip()) < 80) and pdfplumber is not None:
+            try:
+                plumber_text = _extract_text_pdfplumber(file_bytes)
+                if len(plumber_text.strip()) > len(plain):
+                    plain = plumber_text
+            except Exception:
+                pass
+
+        # 3) OCR fallback
+        if (not plain or len(plain.strip()) < 200) and OCR_AVAILABLE:
+            try:
+                ocr_text = _ocr_pdf_bytes(file_bytes)
+                if len(ocr_text.strip()) > len(plain):
+                    plain = ocr_text
+            except Exception:
+                pass
 
     # final cleaning
     # final cleaning + unicode fix

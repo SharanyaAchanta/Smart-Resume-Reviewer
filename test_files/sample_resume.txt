@@ -1,0 +1,26 @@
+JOHN DOE
+Software Engineer
+Email: john@example.com | Phone: +1-234-567-8900
+
+SUMMARY
+Experienced software engineer with 5+ years in full-stack development.
+
+EXPERIENCE
+Senior Software Engineer | Tech Corp | 2020-Present
+- Developed scalable web applications using React and Node.js
+- Led team of 5 developers on major projects
+- Improved application performance by 40%
+
+Software Engineer | StartupXYZ | 2018-2020
+- Built RESTful APIs using Python and Django
+- Implemented CI/CD pipelines
+- Worked on microservices architecture
+
+EDUCATION
+Bachelor of Science in Computer Science
+University of Technology | 2014-2018
+
+SKILLS
+Programming: Python, JavaScript, Java, C++
+Frameworks: React, Node.js, Django, Spring Boot
+Tools: Git, Docker, Kubernetes, AWS
