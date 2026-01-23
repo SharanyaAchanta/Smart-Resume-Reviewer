@@ -501,7 +501,7 @@ if isinstance(job_roles, dict) and selected_category in job_roles:
     roles = list(job_roles[selected_category].keys())
     selected_role = st.selectbox("Select Specific Role:", roles, key="role_select")
     role_info = job_roles[selected_category][selected_role]
-    with st.expander(f"📌 {selected_role} - Required Skills & Info", expanded=True):
+    with st.expander(f" {selected_role} - Required Skills & Info", expanded=True):
         c1, c2 = st.columns(2)
         with c1:
             st.info(role_info.get("description", "No description available"))
@@ -539,6 +539,16 @@ if uploaded_file:
     st.markdown("---")
     show_resume_preview(uploaded_file, show_full_preview=False)
     st.markdown("---")
+    # Validate the uploaded file (including MIME type check)
+    if uploaded_file_temp:
+        is_valid, error_message = validate_uploaded_file(uploaded_file_temp)
+        if not is_valid:
+            st.error(error_message)
+            uploaded_file = None
+        else:
+            uploaded_file = uploaded_file_temp
+    else:
+        uploaded_file = None
 
 # --- ANALYSIS DASHBOARD ---
 if uploaded_file:
@@ -603,8 +613,8 @@ if results:
     except Exception as e:
         print("History Save Failed:", e)
 
-    # ---------------- 📊 COMPARISON SECTION ----------------
-    st.markdown("### 📊 Resume Version Comparison")
+    # ----------------  COMPARISON SECTION ----------------
+    st.markdown("###  Resume Version Comparison")
 
     if len(st.session_state.review_history) >= 2:
         reviews = st.session_state.review_history

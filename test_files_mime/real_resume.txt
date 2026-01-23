@@ -1,0 +1,19 @@
+JOHN DOE
+Senior Software Engineer
+Email: john.doe@email.com | Phone: +1-234-567-8900
+
+PROFESSIONAL SUMMARY
+Experienced software engineer with 8+ years in full-stack development.
+
+WORK EXPERIENCE
+Senior Software Engineer | Tech Corp | Jan 2020 - Present
+- Led development of microservices architecture
+- Improved API performance by 60%
+
+EDUCATION
+Master of Science in Computer Science | MIT | 2016
+
+TECHNICAL SKILLS
+Languages: Python, JavaScript, Java
+Frameworks: React, Node.js, Django
+Tools: Docker, Kubernetes, AWS
