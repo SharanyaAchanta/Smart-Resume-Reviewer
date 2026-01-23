@@ -501,7 +501,7 @@ if isinstance(job_roles, dict) and selected_category in job_roles:
     roles = list(job_roles[selected_category].keys())
     selected_role = st.selectbox("Select Specific Role:", roles, key="role_select")
     role_info = job_roles[selected_category][selected_role]
-    with st.expander(f"📌 {selected_role} - Required Skills & Info", expanded=True):
+    with st.expander(f" {selected_role} - Required Skills & Info", expanded=True):
         c1, c2 = st.columns(2)
         with c1:
             st.info(role_info.get("description", "No description available"))
@@ -519,13 +519,28 @@ st.info(
 # --- HANDLE FILE FROM LANDING PAGE ---
 if "uploaded_file_temp" in st.session_state and st.session_state.uploaded_file_temp:
     uploaded_file = st.session_state.uploaded_file_temp
-    # Keep it persistent? Or clear it? 
+    # Keep it persistent? Or clear it?
     # For now, let's just use it.
 else:
-    # Fallback uploader on Analyzer page
-    uploaded_file = st.file_uploader(
-        "Upload Resume (PDF)", type="pdf", help="Upload a PDF resume to analyze"
+    # Fallback uploader on Analyzer page with validation
+    from components.upload_card import validate_uploaded_file, ALLOWED_FILE_TYPES, MAX_FILE_SIZE_MB
+
+    uploaded_file_temp = st.file_uploader(
+        "Upload Resume (PDF, DOCX, TXT)",
+        type=ALLOWED_FILE_TYPES,
+        help=f"Upload a resume file (max {MAX_FILE_SIZE_MB} MB) to analyze"
     )
+
+    # Validate the uploaded file (including MIME type check)
+    if uploaded_file_temp:
+        is_valid, error_message = validate_uploaded_file(uploaded_file_temp)
+        if not is_valid:
+            st.error(error_message)
+            uploaded_file = None
+        else:
+            uploaded_file = uploaded_file_temp
+    else:
+        uploaded_file = None
 
 # --- ANALYSIS DASHBOARD ---
 if uploaded_file:
@@ -590,8 +605,8 @@ if results:
     except Exception as e:
         print("History Save Failed:", e)
 
-    # ---------------- 📊 COMPARISON SECTION ----------------
-    st.markdown("### 📊 Resume Version Comparison")
+    # ----------------  COMPARISON SECTION ----------------
+    st.markdown("###  Resume Version Comparison")
 
     if len(st.session_state.review_history) >= 2:
         reviews = st.session_state.review_history
