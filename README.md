@@ -217,8 +217,9 @@ Smart-Resume-Reviewer/
 
 ### 1️⃣ Create Virtual Environment
 
-    virtualenv venv
-    ./venv/Scripts/activate
+    python -m venv venv
+    venv\Scripts\activate
+
 
 ### 2️⃣ Install Dependencies
 
